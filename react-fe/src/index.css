@@ -1,0 +1,29 @@
+header .container {
+	max-width:1400px;
+	margin: 0 auto; 
+	padding: 10px 20px; 
+	display: flex; 
+	align-items: center;
+	justify-content: space-between; 
+	border: 2px solid black;
+}
+
+.centered {
+	position: fixed; 
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.receiptSelectTableRow {
+	display: flex; 
+	flex-direction: row;
+	border: 2px solid black;
+}
+
+.receiptSelectTableCell {
+	flex:1;
+	border: 2px;
+}
+
+
