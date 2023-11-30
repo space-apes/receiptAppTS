@@ -35,8 +35,7 @@
     - ...
 
 4. run BE population script
-  - create tables
-  - populate with test users and transactions 
+  - npx ts-node populateDB.ts
 
 5. start up BE server 
   - cd expressReceiptBE 

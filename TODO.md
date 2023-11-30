@@ -9,6 +9,7 @@
 - endpoint for logged in users to see old transactions
   - should not be able to access other transactions 
 - make sure to update cors for safety on both FE and BE 
+  - set it by environment variable 'local' / 'dev' / 'prod' etc 
 - make sure to remove all that global context stuff or decide to keep it
 - decide on adding the socket listeners within specific components
   - app wide is extra traffic for the server and clients listening when they dont need to 
@@ -17,12 +18,24 @@
 - have BE running in HTTPS
 - write auth middleware but REPLACE WITH PASSPORT, then maybe aws cognify
 - make rooms expire 
+- ensure logic is pulled out of controller functions into library files/functions
+  - controller should only do the following: 
+    - validate any submitted data 
+    - call authorization function
+    - retrieve data from db
+    - call business logic function
+    - respond 
 - do authorization on rooms for limited number of users (set by initiator) 
   - join() request with credentials 
 
 - maake rooms scalable. when x number of simultaneous users, scale horizontally
 - receipt limit! 
   - number of items 
+- tests 
+  - endpoint tests 
+  - unit tests
+  - security tests
+- consider storing money as a diff datatype in db 
 
 
 # REGISTRATION FLOW: NEED TO FIGURE OUT HOW ROOMKEY IS PERSISTED should be in JWT somehow
