@@ -3,46 +3,34 @@ import http from 'http';
 import {Server} from 'socket.io'; 
 import cors from 'cors'; 
 import dotenv from 'dotenv';
+import {displayRequestsMiddleware} from './middleware';
 import {userRouter} from './routes'; 
+
+
 dotenv.config(); 
 const app:Express = express(); 
 const server = http.createServer(app); 
 
-
-//TODO update cors for both socket and http server
 
 //add cors to whitelist only local 
 const io = new Server(server, {
 	cors: {origin: "*"}
 }); 
 
-app.use(cors({
-	origin: "*"
-}));
+//main app middleware
+app.use([
+    cors({origin: "*"}),
+    displayRequestsMiddleware,
+    express.json(),
+]);
 
-
-
-
-//basic route 
+//basic test route 
 app.get('/', (req:Request, res:Response) => {
 	res.json({'msg:': 'the rootest path. express + typescript server! woohoo!'}); 
 });
 
 //users routes
-app.use('/api/users', [express.json(), userRouter]); 
-
-/*
-//add router to application and set the url prefix
-//routers implement middleware interface so can be used 
-// as one of the sequential middlewares! 
-app.use('/api/workouts/', [
-	express.json({
-		type: 'application/json',
-		limit: '50kb'
-	}),
-	 workoutsRouter
-]);
-*/
+app.use('/api/users', userRouter); 
 
 
 //socket server

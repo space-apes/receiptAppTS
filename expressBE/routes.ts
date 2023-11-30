@@ -1,23 +1,29 @@
 import {Router} from 'express'; 
-import {registerUser} from './controllers/userController'; 
+import {
+    registerUser,
+    loginGetToken
+} from './controllers/usersController'; 
 
-/*
-const {Router} = require('express');
 
-const {
-    registerUser
-} = require ('./controllers/userController');
-*/
-
-// USER ROUTES 
+/***  USER ROUTES ***/ 
 const userRouter = Router();
-//register user 
+
 userRouter.post('/register', registerUser);
-//get users from transactionId
-//get user 
-//login
+userRouter.post('/login', loginGetToken);
 //verify token 
 
-//TRANSACTION ROUTES
 
-export {userRouter};
+
+/***  TRANSACTION ROUTES ***/
+const transactionRouter = Router(); 
+
+//create transaction 
+//get transactions from userId 
+//get users from transactionId
+
+
+
+export {
+    userRouter, 
+    transactionRouter
+};

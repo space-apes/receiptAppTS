@@ -2,7 +2,10 @@
     shared connectionpool across the app
 */
 
-var mysql = require('mysql2');
+//var mysql = require('mysql2/promise');
+
+import mysql from 'mysql2/promise'; 
+
 require('dotenv').config();
  
  var dbPool = mysql.createPool({
@@ -14,4 +17,4 @@ require('dotenv').config();
 }); 
 
 
-exports.dbPool = dbPool;
+export {dbPool};
