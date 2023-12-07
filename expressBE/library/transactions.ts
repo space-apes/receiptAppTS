@@ -1,5 +1,4 @@
 import {dbPool} from '../db';
-import argon2 from 'argon2'; 
 import {ResultSetHeader} from 'mysql2';
 import {ReceiptItemType} from '../types';
 
@@ -25,18 +24,19 @@ let createTransaction = async (initiatorUserId:number, businessName:string, rece
 
         const newTransactionId = insertTransactionResult[0].insertId;
 
+        // add transactionId
         receiptItemsArray.forEach((i) => i.push(newTransactionId));
-
+        
         console.log('receiptItems after adding transactionId');
         console.log(receiptItemsArray);
 
         let insertTransactionItemsQuery = `
         INSERT INTO transactionsItems (userId, username, itemName, itemPrice, transactionId)
-        VALUES (?); 
+        VALUES ?; 
         `;
 
 
-        await dbPool.execute(insertTransactionItemsQuery, [receiptItemsArray]);
+        await dbPool.query(insertTransactionItemsQuery, [receiptItemsArray]);
 
         return newTransactionId; 
 

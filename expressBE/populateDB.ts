@@ -13,7 +13,7 @@ async function main() {
         user: process.env.DB_USER, 
         password: process.env.DB_PASSWORD,
         database: process.env.DB_DATABASE, 
-        connectionLimit: 10
+        connectionLimit: 10, 
     }); 
 
     //create Users Table 
@@ -48,7 +48,7 @@ async function main() {
         username varchar(255) NOT NULL, 
 		itemName varchar(255) NOT NULL,
         itemPrice decimal(19,4) NOT NULL DEFAULT 0.00,
-        dateCreated datetime NOT NULL, 
+        dateCreated datetime NOT NULL DEFAULT NOW(), 
         PRIMARY KEY(transactionsItemsId)
     );
     `
@@ -163,6 +163,7 @@ async function main() {
 			]
 		},
 	];
+
 
 	testTransactions.forEach((t)=>{
 		createTransaction(t.initiatorUserId, t.businessName, t.receiptItemsArray); 	
