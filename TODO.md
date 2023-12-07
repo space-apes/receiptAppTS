@@ -1,3 +1,23 @@
+## Immediate Tasks
+- Get Authentication w/ JWT working
+- Build pages and flow
+- Integrate from Flowchart
+
+---
+
+### Jen Practice WebApp Tasks
+- Add an Endpoint (BE) 
+	- Transactions Endpoint
+	- transactions/ ___
+	- Supply User ID
+	- Response: All transactions that the users is a part of 
+		- Data such as Initiator user, Business name, date, all items from transaction 
+- Add a Component or Page (FE)
+	- Based on user, calculate own total from transaction (based on user id)  
+- Prioritize what we gotta do (Move tasks to Git Projects)
+
+---
+
 - validate username and password using argon2
 - decide on JWT scheme
   - userId

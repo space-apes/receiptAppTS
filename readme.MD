@@ -21,13 +21,21 @@
 1. clone entire repo
 2. install dependencies by running 'npm install' in both 
 3. install mySQL server locally, note credentials, URL, db   
+4. Create dev database on mysql server
+	- log-in to mysql server via mysql client (DBeaver)
+	- MySQL Script:
+	```
+	CREATE DATABASE receiptAppDev
+	```
 3. create .env files 
   - BE: needs fields:
     - String: ENVIRONMENT (set to 'prod' or 'dev' for now) this will set CORS hosts
     - Number: EXPRESS_PORT
-    - String[]: PROD_ALLOWED_HOSTS
+    - String[]: ALLOWED_HOSTS
     - String: JWT_SECRET
+    - String: DB_DATABASE
     - String: DB_URL
+    - String: DB_USER
     - String: DB_PASSWORD 
 
   - FE needs fields: 
