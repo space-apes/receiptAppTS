@@ -2,8 +2,8 @@
 	controller functions for endpoints should not do any business logic for ease of testing. 
 	business logic should be moved to a separate library file in src/library/{nameOfResource}.js
 	limit endpoint functions to the following: 
-	- validate input 
-	- authorize 
+	- validate input: if invalid respond 422 with msg "invalid payload"
+	- authorize: if unauthorized respond 403 with meg "forbidden"
 	- retrieve data 
 	* execute library functions for business logic 
 	- send response
@@ -12,6 +12,7 @@
 import {Request, Response} from 'express'; 
 import {sign, verify} from 'jsonwebtoken'; 
 import {createUser} from '../library/users';
+import {getRandomRoomName} from '../library/socket';
 
 const argon2 = require('argon2');
 const { dbPool } = require('../db');
@@ -19,11 +20,8 @@ const { dbPool } = require('../db');
 
 const loginGetToken = async (req:Request,res:Response) => {
   const {email, password} = req.body; 
-  //if fields not sent, respond 422
-  //if password incorrect, respond 401
-  //create token
-  //respond 201 with token
 
+  //if fields not sent, respond 422
 
   // retrieve hashed password for userId from db 
   // test if provided password hashed matches hashed password in db 
@@ -34,28 +32,47 @@ const loginGetToken = async (req:Request,res:Response) => {
     WHERE u.email = ?
     `;
 
+
     const [rows, fields] = await dbPool.execute(userFromEmailQuery, [email]); 
 
-    
+    // no user found 
+    if (rows.length == 0){
+      return res.status(401).json({msg: 'invalid credentials'});
+    }
+   
+    // if user found and hashed password matches password in db
     if (await argon2.verify(rows[0]['password'], password)){
-	  
+	 
+    //create JWT
 	  let token = sign (
 		  {
 			userId: rows[0]['userId'],
-		  }, 
+      username: `${rows[0]['firstName']} ${rows[0]['lastName'].substring(0,1)}.`,
+      roomName: getRandomRoomName(),  
+		  },
+
 		  process.env.JWT_SECRET as string,
 		  {
-		    expiresIn: '2m'
+		    expiresIn: '1h'
 		  }
 	  );
 
-      res.status(200).json({
+    //create httpOnly cookie to store jwt 
+    res.cookie("jwt", token, {
+      maxAge:60000 * 60,
+      httpOnly:true,
+      //secure:true
+    });
+
+    //give success response
+    return res.status(200).json({
 	  	message: "successfully logged in", 
-		jwt: token
 	  });
+
     }
+    //hashed password does not match db 
     else{
-      res.status(401).json({message: "forbidden"});
+      return res.status(401).json({message: "invalid credentials"});
     }
   } 
   catch(err){
@@ -83,6 +100,8 @@ const registerUser = async (req:Request,res:Response)=>{
 
     const newUserId = await createUser(email, password, firstName, lastName); 
 
+
+
     if (newUserId == -1){
       return res.status(400).json ({msg: 'user not created'});
     }
@@ -93,31 +112,6 @@ const registerUser = async (req:Request,res:Response)=>{
     }
 
 
-
-    /*
-      try {
-
-        const hash = await argon2.hash(password); 
-        console.log(`hash: ${hash}`);
-
-        let insertUserQuery = `
-        INSERT INTO users (firstName, lastName, email, password, dateCreated)
-        VALUES (?, ?, ?, ?, NOW());
-        `
-        dbPool.execute(insertUserQuery, [firstName,lastName,email, hash]);
-
-        res.status(201).json({msg: "created user"});
-
-      }
-      catch(error)
-      {
-        console.log(error);
-      }
-      */
-
-      // store both  
-    // create token 
-    // respond with token  201 
 }
 
 /*
