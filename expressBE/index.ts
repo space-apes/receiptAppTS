@@ -30,7 +30,7 @@ app.get('/', (req:Request, res:Response) => {
 });
 
 //users routes
-app.use('/api/users', userRouter); 
+app.use('/api/users', [express.json(), userRouter]); 
 
 
 //socket server
