@@ -114,26 +114,6 @@ const registerUser = async (req:Request,res:Response)=>{
 
 }
 
-/*
-const login = (req:Request,res:Response)=>{
-
-
-}
-*/
-
-/*
-// 
-
-does the user have access to perform this action on this resource?
-i think we can use JWTs here and instead of making an endpoint, let's try to make it so authorization
-does not take an extra request.
-i think we can make a middleware or do a check on each endpoint hit 
-then redirect to login screen if authorization fails 
-
-const authorizeUserFromToken = (userId, token) => {
-
-}
-*/
 
 export {
   registerUser,
