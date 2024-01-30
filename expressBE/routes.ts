@@ -8,7 +8,7 @@ import {
 /***  USER ROUTES ***/ 
 const userRouter = Router();
 
-userRouter.post('/user', registerUser);
+userRouter.post('/', registerUser);
 userRouter.post('/login', loginGetToken);
 //verify token 
 
