@@ -1,21 +1,6 @@
-#how to run the receipt app
+# Introduction
 
-
-# items to discuss today: 
-- GETTING LOCAL ENVIRONMENT UP 
-- fe and be 
-- env files for both fe and be 
-- authentication plan: for now do self, in future use cognify
-- user plan: 
-  - all guests will be users too and will be persisted in db. i forget why but there was a compelling reason. 
-- jwt plan: 
-  - jwt stored in http-only cookie on login or 'continue as guest' 
-  - userId:to narrow down which resources user can interact with
-  - room-name: in case user closes browser by accident, so that socket.io broadcasts messages to the right clients 
-- transitioning between pages 
-- DB plan; creating/updating ERD
-  - note.io stored within repo 
-- what is next step for both of us: create git project and high level sagas, break sagas down into tickets and assig 
+# features 
 
 # how to run the app
 1. clone entire repo
