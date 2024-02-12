@@ -3,19 +3,18 @@ import http from 'http';
 import {Server} from 'socket.io'; 
 import cors from 'cors'; 
 import dotenv from 'dotenv';
+import {openAPIDocJSON} from './library/openAPIDoc';
+import swaggerUi from 'swagger-ui-express';
 import {displayRequestsMiddleware} from './middleware';
-import {userRouter} from './routes'; 
+import {userRouter} from './routes';
 
+console.log(openAPIDocJSON);
 
 dotenv.config(); 
+
+// create express app
 const app:Express = express(); 
-const server = http.createServer(app); 
 
-
-//add cors to whitelist only local 
-const io = new Server(server, {
-	cors: {origin: "*"}
-}); 
 
 //main app middleware
 app.use([
@@ -31,6 +30,10 @@ app.get('/', (req:Request, res:Response) => {
 
 //users routes
 app.use('/api/users', [express.json(), userRouter]); 
+
+//openAPI documentation routes
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openAPIDocJSON));
+
 
 
 //socket server
@@ -62,7 +65,17 @@ let receiptArray = [
     }
 ];
 
+//create http server
+const server = http.createServer(app); 
 
+
+//create socket.io server
+// TODO: add cors to whitelist only local 
+const io = new Server(server, {
+	cors: {origin: "*"}
+}); 
+
+// add socket handlers for BE 
 io.on('connection', (socket) => {
 	console.log('a user connected'); 
 	io.emit('receiptArray', receiptArray); 
@@ -76,7 +89,7 @@ io.on('connection', (socket) => {
 	});
 });
 
-//start the server 
+//start the http server 
 server.listen(process.env.EXPRESS_PORT as string, ()=>{
 	console.log(`express running on ts-node listening on port: ${process.env.EXPRESS_PORT}`);
 }); 

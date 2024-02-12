@@ -80,13 +80,52 @@ const loginGetToken = async (req:Request,res:Response) => {
   }
 }
 
-  /*
+// to kickstart *s on each line in vscode, start comment with /** 
 
-
-/*
-  openAPI comment here with shape of expected body 
-
-*/
+/**
+ * @openapi
+ * /api/users/:
+ *   post:
+ *     summary: creates and persists new User
+ *     requestBody:
+ *       required: true 
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName: 
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               email:
+ *                 type: string 
+ *               password:
+ *                 type: string  
+ *     responses:
+ *       '201':
+ *         description: successful creation of User
+ *         content:
+ *           application/json: 
+ *             schema:
+ *               type: object 
+ *               properties:
+ *                 userId: 
+ *                   type: integer
+ *                   format: int64
+ *                   msg:
+ *                     type: string
+ *       '400': 
+ *         description: catch-all invalid input response
+ *         content: 
+ *           application/json:
+ *             schema: 
+ *               type: object
+ *               properties:
+ *                 msg: 
+ *                   type: string
+ *  
+ */
 
 const registerUser = async (req:Request,res:Response)=>{
   
