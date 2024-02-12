@@ -84,7 +84,7 @@ const loginGetToken = async (req:Request,res:Response) => {
 
 /**
  * @openapi
- * /users:
+ * /api/users/:
  *   post:
  *     summary: creates and persists new User
  *     requestBody:

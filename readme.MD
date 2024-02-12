@@ -16,6 +16,8 @@
   - BE: needs fields:
     - String: ENVIRONMENT (set to 'prod' or 'dev' for now) this will set CORS hosts
     - Number: EXPRESS_PORT
+    - String: EXPRESS_BASE_URL #ex: https://127.0.0.1
+    - string: EXPRESS_URL_PATH_PREFIX #ex: /api
     - String[]: ALLOWED_HOSTS
     - String: JWT_SECRET
     - String: DB_DATABASE
