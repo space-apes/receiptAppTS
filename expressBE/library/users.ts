@@ -25,8 +25,7 @@ let createUser = async (email:string, password:string, firstName:string, lastNam
       }
       catch(error)
       {
-        console.log(error);
-        return -1; 
+        throw error; 
       }
 }
 
