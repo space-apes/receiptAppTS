@@ -1,15 +1,4 @@
-/*
-	controller functions for endpoints should not do any business logic for ease of testing. 
-	business logic should be moved to a separate library file in src/library/{nameOfResource}.js
-	limit endpoint functions to the following: 
-	- validate input: if invalid respond 422 with msg "invalid payload"
-	- authorize: if unauthorized respond 403 with meg "forbidden"
-	- retrieve data 
-	* execute library functions for business logic 
-	- send response
-*/
-
-import {Request, Response} from 'express'; 
+import {Request, Response, NextFunction} from 'express'; 
 import {sign, verify} from 'jsonwebtoken'; 
 import {createUser} from '../library/users';
 import {getRandomRoomName} from '../library/socket';
@@ -18,7 +7,7 @@ const argon2 = require('argon2');
 const { dbPool } = require('../db');
 
 
-const loginGetToken = async (req:Request,res:Response) => {
+const loginGetToken = async (req:Request,res:Response, next: NextFunction) => {
   const {email, password} = req.body; 
 
   //if fields not sent, respond 422
@@ -93,6 +82,11 @@ const loginGetToken = async (req:Request,res:Response) => {
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - firstName
+ *               - lastName
+ *               - email
+ *               - password
  *             properties:
  *               firstName: 
  *                 type: string
@@ -109,25 +103,34 @@ const loginGetToken = async (req:Request,res:Response) => {
  *           application/json: 
  *             schema:
  *               type: object 
+ *               required: 
+ *                 - userId
+ *                 - msg
  *               properties:
  *                 userId: 
  *                   type: integer
  *                   format: int64
- *                   msg:
- *                     type: string
+ *                 msg:
+ *                   type: string
  *       '400': 
  *         description: catch-all invalid input response
  *         content: 
  *           application/json:
  *             schema: 
  *               type: object
+ *               required: 
+ *                 - msg 
+ *                 - userId
  *               properties:
  *                 msg: 
  *                   type: string
+ *                 userId: 
+ *                   type: integer 
+ *                   format: int64
  *  
  */
 
-const registerUser = async (req:Request,res:Response)=>{
+const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
   
   const {firstName, lastName, email, password} = req.body;
 
@@ -137,21 +140,23 @@ const registerUser = async (req:Request,res:Response)=>{
 
     // otherwise create entry in db 
 
-    const newUserId = await createUser(email, password, firstName, lastName); 
-
-
-
-    if (newUserId == -1){
-      return res.status(400).json ({msg: 'user not created'});
+    try{ 
+      
+      const newUserId = await createUser(email, password, firstName, lastName); 
+      
+  
+      return res.status(201).json(
+        {
+          userId: newUserId,
+          msg: 'user created successfuly'
+        }
+      );
+      
+    }catch(err){
+      next(err);
     }
-    else 
-    {
-      //respond with jwt 
-      return res.status(201).json({msg: 'user created successfuly'})
-    }
-
-
-}
+  
+  }
 
 
 export {
