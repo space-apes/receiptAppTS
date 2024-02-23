@@ -1,7 +1,10 @@
 import {Router} from 'express'; 
 import {
     registerUser,
-    loginGetToken
+    loginGetToken,
+    getUser,
+    updateUser,
+    deleteUser
 } from './controllers/usersController'; 
 
 
@@ -9,7 +12,10 @@ import {
 const userRouter = Router();
 
 userRouter.post('/', registerUser);
+userRouter.get('/:userId', getUser);
 userRouter.post('/login', loginGetToken);
+userRouter.put('/:userId', updateUser);
+userRouter.delete('/:userId', deleteUser);
 //verify token 
 
 

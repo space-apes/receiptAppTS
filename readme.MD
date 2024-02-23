@@ -1,4 +1,21 @@
 # Introduction
+this is my dream BE project with the goal to minimize software maintenance costs and developer headaches.  
+
+single-language stack: typescript react FE and typescript express BE. less context switching when doing full-stack work. FE and BE teams can communicate more clearly and understand each other's needs.  
+
+contract driven API development: single source of truth using openAPI 3.0 specification, generate as much code by trusted open source libraries as possible over writing my own solutions. language/framework agnostic and can switch technologies if needed. 
+
+test-driven: increase coverage, eliminate bias of writing tests to fit code that has already been written. 
+
+12 factor app: adheres to as much as possible.... TODO
+
+3 layer architecture: controller/API layer, data store service layer, business logic layer. each can be swapped with minimal effect on other layers. each layer can be tested independently and together. 
+
+
+experiment with sockets and asynchronous communication 
+experiment with enterprise level work flow
+experiment with avoiding ORM
+
 
 # stack 
 
@@ -11,6 +28,8 @@
   - the json is used to generate validation middleware using express-openapi-validator
   - the json also used to generate API documentation using express-ui
   - the next API i build i would like to start completely from opanAPI spec and generate everything else 
+- custom Errors, APIError handling flow, synchronous and asynchronous error handling flow 
+- 
 - test driven 
   - TODO 
 - asynchronous communication through sockets 
@@ -21,6 +40,12 @@
 - non-MVC
   - i love MVC pattern but i wanted to exercise...
   - TODO
+
+# future improvements: 
+- be completely contract driven instead of partially and generate all controller, validator, model code from contract
+- pull User, Transaction, Session, and ReceiptParsing services into their own micro-service instances with Dockerfiles and node images. reverse-proxy for monitoring, load-balancers for each service with horizontal scaling
+- further separate service layer into generic data retrieval layers and programatic business logic/processing layer. the data retrieval layer could handle retrieving and formatting data in some standardized way and the business logic layer could remain unchanged. 
+
 
 # how to run the app
 1. clone entire repo
