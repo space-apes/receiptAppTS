@@ -2,9 +2,34 @@ import {Request, Response, NextFunction} from 'express';
 import {sign, verify} from 'jsonwebtoken'; 
 import {createUser} from '../library/users';
 import {getRandomRoomName} from '../library/socket';
+import User from '../types/user'; 
+import UserDataServiceInterface from '../services/userDataService/userDataServiceInterface';
+import SqlUserDataService from '../services/userDataService/sqlUserDataService';
+import dotenv from 'dotenv';
 
 const argon2 = require('argon2');
 const { dbPool } = require('../db');
+
+dotenv.config(); 
+
+
+
+//determine which userData service to use based on the environment
+//default case is SqlUserData Service because must assign value to global
+//will make it the inMemoryUserDataService soon
+
+let userDataService: UserDataServiceInterface = new SqlUserDataService();
+
+switch (process.env.NODE_ENV){
+  //case 'local': 
+  //  userDataService = new InMemoryUserDataService(); 
+  case 'dev': 
+    userDataService = new SqlUserDataService();
+    break;
+  default: 
+    userDataService = new SqlUserDataService(); 
+}
+
 
 
 const loginGetToken = async (req:Request,res:Response, next: NextFunction) => {
@@ -134,16 +159,10 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
   
   const {firstName, lastName, email, password} = req.body;
 
-    //if fields not sent, respond  422 
-
-    //if user already exists, respond 409 
-
-    // otherwise create entry in db 
-
     try{ 
       
-      const newUserId = await createUser(email, password, firstName, lastName); 
-      
+      //let sqlUserService = new SqlUserService(); 
+      let newUserId = await userDataService.create(firstName, lastName, email, password); 
   
       return res.status(201).json(
         {
@@ -151,17 +170,181 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
           msg: 'user created successfuly'
         }
       );
-      
+
     }catch(err){
       next(err);
     }
   
   }
 
+/**
+ * @openapi
+ * /api/users/{userId}:
+ *   get:
+ *     summary: retrieves User by userId
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *     responses: 
+ *       '200':
+ *         description: successfully retrieved user resource
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - lastName
+ *                 - firstName
+ *                 - userId
+ *                 - email
+ *               properties:
+ *                 lastName:
+ *                   type: string
+ *                 firstName:
+ *                   type: string
+ *                 userId:
+ *                   type: integer
+ *                 email: 
+ *                   type: string
+ *             
+ */
+
+  const getUser = async (req: Request, res: Response, next: NextFunction) => {
+    const userId = parseInt(req.params.userId); 
+
+    try {
+
+      let user: User = await userDataService.getByUserId(userId);
+     
+      return res.status(200).json({msg: "successfully retrieved user", ...user});
+
+    }catch(err){
+      next(err);
+    }
+
+  }
+
+/**
+ * @openapi
+ * /api/users/{userId}:
+ *   put:
+ *     summary: retrieves User by userId
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *     requestBody:
+ *       required: true 
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             minProperties: 1
+ *             properties:
+ *               firstName: 
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *     responses: 
+ *       '200':
+ *         description: successfully updated User resource
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - lastName
+ *                 - firstName
+ *                 - userId
+ *                 - email
+ *               properties:
+ *                 lastName:
+ *                   type: string
+ *                 firstName:
+ *                   type: string
+ *                 userId:
+ *                   type: integer
+ *                 email: 
+ *                   type: string
+ *       '400':
+ *         description: invalid request 
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - msg
+ *               properties:
+ *                 msg: 
+ *                   type: string 
+ */
+  const updateUser = async (req: Request, res: Response, next: NextFunction) => {
+
+    const lastName: string | undefined = req.body.lastName ? req.body.lastName : null;
+    const firstName: string | undefined = req.body.firstName ? req.body.firstName : null;
+    const email: string | undefined = req.body.email ? req.body.email : null;
+    const userId : number = req.params.userId ? parseInt(req.params.userId) : -1;
+
+    try{
+
+      let updatedUser : User = await userDataService.update(userId, firstName, lastName, email);
+      return res.status(200).json(updatedUser);
+
+    }
+    catch(err){
+      next(err);
+    }
+  }
+
+
+/**
+ * @openapi
+ * /api/users/{userId}:
+ *   delete:
+ *     summary: delete User by userId
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *     responses: 
+ *       '204':
+ *         description: successfully deleted user resource
+ *       '404': 
+ *         description: resource not found
+ */
+  const deleteUser = async (req: Request, res: Response, next: NextFunction)  => {
+    
+    let userId : number = parseInt(req.params.userId);
+
+    try {
+      userDataService.delete(userId);
+
+      return res.status(204);
+    }catch(err){
+      next(err);
+    }
+  }
+
 
 export {
+  getUser,
   registerUser,
-  loginGetToken
+  loginGetToken,
+  updateUser,
+  deleteUser
 };
 
 

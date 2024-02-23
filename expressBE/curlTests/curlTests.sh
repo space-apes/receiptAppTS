@@ -5,6 +5,8 @@
 #you can prettify response body by removing --include and piping curl
 # into 'jq' command
 
+# BEWARE OF TRAILING COMMAS IN FINAL ELEMENTS OF PAYLOADS! haha...
+
 ########## VARIABLES #########
 URL="http://127.0.0.1:4000/api"
 
@@ -42,6 +44,80 @@ POST_login_success_1() {
      --header 'Content-Type: application/json' \
      --data "$payload" \
      "$URL/users/login"
+}
+
+GET_users_success_1(){
+    curl \
+     --request 'GET' \
+     "$URL/users/1" | jq
+
+}
+
+PUT_users_success_1(){
+
+    payload='{
+        "email": "testUser1Updated@test.com"
+    }'
+
+    curl \
+     --include \
+     --cookie-jar 'cookies.txt' \
+     --request 'PUT' \
+     --header 'Content-Type: application/json' \
+     --data "$payload" \
+     "$URL/users/1"
+}
+
+PUT_users_success_2(){
+
+    payload='{
+        "email": "testUser1UpdatedSecond@test.com",
+		"firstName": "testUser1UpdatedSecondFirstName"
+    }'
+
+    curl \
+     --include \
+     --cookie-jar 'cookies.txt' \
+     --request 'PUT' \
+     --header 'Content-Type: application/json' \
+     --data "$payload" \
+     "$URL/users/1"
+}
+
+PUT_users_failure_noUpdatedFields1(){
+
+    curl \
+     --include \
+     --cookie-jar 'cookies.txt' \
+     --request 'PUT' \
+     --header 'Content-Type: application/json' \
+     "$URL/users/1"
+}
+
+PUT_users_failure_invalidFields1(){
+
+    payload='{
+        "chickens": "testUser1UpdatedSecond@test.com"
+    }'
+
+    curl \
+     --include \
+     --cookie-jar 'cookies.txt' \
+     --request 'PUT' \
+     --header 'Content-Type: application/json' \
+     --data "$payload" \
+     "$URL/users/1"
+}
+
+
+DELETE_users_success1(){
+
+    curl \
+     --include \
+     --cookie-jar 'cookies.txt' \
+     --request 'DELETE' \
+     --header 'Content-Type: application/json' \
+     "$URL/users/1"
 }
 
 

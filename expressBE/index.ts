@@ -41,6 +41,7 @@ app.use(express.urlencoded({extended: false}));
 
 
 //validator middleware
+
 app.use(
 	OpenApiValidator.middleware({
 		apiSpec: './openApiSpec.json',

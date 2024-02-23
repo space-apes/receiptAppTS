@@ -1,8 +1,8 @@
-interface ReceiptItemType {
+interface ReceiptItem {
     userId: number, 
     username: string, 
     itemName: string, 
     itemPrice: number, 
 }
 
-export {ReceiptItemType}; 
+export default ReceiptItem;
