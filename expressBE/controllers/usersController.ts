@@ -1,11 +1,19 @@
 import {Request, Response, NextFunction} from 'express'; 
 import {sign, verify} from 'jsonwebtoken'; 
-import {createUser} from '../library/users';
 import {getRandomRoomName} from '../library/socket';
 import User from '../types/user'; 
 import UserDataServiceInterface from '../services/userDataService/userDataServiceInterface';
 import SqlUserDataService from '../services/userDataService/sqlUserDataService';
-import dotenv from 'dotenv';
+import { 
+  UserDataServiceAlreadyExistsError,
+  UserDataServiceNotFoundError
+} from '../services/userDataService/userDataServiceError';
+import {
+  APINotFoundError,
+  APIAlreadyExistsError
+} from '../errors/apiError';
+
+ import dotenv from 'dotenv';
 
 const argon2 = require('argon2');
 const { dbPool } = require('../db');
@@ -16,6 +24,8 @@ dotenv.config();
 
 //determine which userData service to use based on the environment
 //default case is SqlUserData Service because must assign value to global
+//THIS WILL EVENTUALLY BE DONE IN INDEX.TS AT TOP LEVEL FOR EACH SERVICE
+//FOR VISIBILITY
 //will make it the inMemoryUserDataService soon
 
 let userDataService: UserDataServiceInterface = new SqlUserDataService();
@@ -35,7 +45,6 @@ switch (process.env.NODE_ENV){
 const loginGetToken = async (req:Request,res:Response, next: NextFunction) => {
   const {email, password} = req.body; 
 
-  //if fields not sent, respond 422
 
   // retrieve hashed password for userId from db 
   // test if provided password hashed matches hashed password in db 
@@ -98,7 +107,7 @@ const loginGetToken = async (req:Request,res:Response, next: NextFunction) => {
 
 /**
  * @openapi
- * /api/users/:
+ * /api/users:
  *   post:
  *     summary: creates and persists new User
  *     requestBody:
@@ -130,13 +139,21 @@ const loginGetToken = async (req:Request,res:Response, next: NextFunction) => {
  *               type: object 
  *               required: 
  *                 - userId
- *                 - msg
  *               properties:
  *                 userId: 
  *                   type: integer
  *                   format: int64
- *                 msg:
- *                   type: string
+ *       '409': 
+ *         description: resource already exists
+ *         content: 
+ *           application/json:
+ *             schema: 
+ *               type: object
+ *               required: 
+ *                 - path
+ *               properties:
+ *                 path:
+ *                   type: string  
  *       '400': 
  *         description: catch-all invalid input response
  *         content: 
@@ -144,14 +161,10 @@ const loginGetToken = async (req:Request,res:Response, next: NextFunction) => {
  *             schema: 
  *               type: object
  *               required: 
- *                 - msg 
- *                 - userId
+ *                 - path
  *               properties:
- *                 msg: 
- *                   type: string
- *                 userId: 
- *                   type: integer 
- *                   format: int64
+ *                 path:
+ *                   type: string  
  *  
  */
 
@@ -161,18 +174,29 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
 
     try{ 
       
-      //let sqlUserService = new SqlUserService(); 
       let newUserId = await userDataService.create(firstName, lastName, email, password); 
   
       return res.status(201).json(
         {
-          userId: newUserId,
-          msg: 'user created successfuly'
+          userId: newUserId
         }
       );
 
     }catch(err){
-      next(err);
+      if (err instanceof UserDataServiceAlreadyExistsError){
+
+        const apiErrorParams = {
+          path: req.originalUrl,
+          logging: true,
+          context: err.context
+        };
+
+        next(new APIAlreadyExistsError(apiErrorParams));
+      }
+      else{
+        next(err);
+      }
+
     }
   
   }
@@ -210,7 +234,17 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
  *                   type: integer
  *                 email: 
  *                   type: string
- *             
+ *       '404':
+ *         description: user resource not found using that URI
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - path
+ *               properties:
+ *                 path: 
+ *                   type: string 
  */
 
   const getUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -218,12 +252,25 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
 
     try {
 
-      let user: User = await userDataService.getByUserId(userId);
+      const user: User = await userDataService.getByUserId(userId);
      
-      return res.status(200).json({msg: "successfully retrieved user", ...user});
+      return res.status(200).json(user);
 
     }catch(err){
-      next(err);
+
+      if (err instanceof UserDataServiceNotFoundError){
+
+        const apiErrorParams = {
+          path: req.originalUrl,
+          logging: true,
+          context: err.context
+        };
+
+        next(new APINotFoundError(apiErrorParams));
+      }
+      else{
+        next(err);
+      }
     }
 
   }
@@ -276,6 +323,17 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
  *                   type: integer
  *                 email: 
  *                   type: string
+ *       '404':
+ *         description: user resource not found using that URI
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - path
+ *               properties:
+ *                 path: 
+ *                   type: string 
  *       '400':
  *         description: invalid request 
  *         content:
@@ -283,9 +341,9 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
  *             schema:
  *               type: object
  *               required:
- *                 - msg
+ *                 - path
  *               properties:
- *                 msg: 
+ *                 path: 
  *                   type: string 
  */
   const updateUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -302,7 +360,19 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
 
     }
     catch(err){
-      next(err);
+      if (err instanceof UserDataServiceNotFoundError){
+
+        const apiErrorParams = {
+          path: req.originalUrl,
+          logging: true,
+          context: err.context
+        };
+
+        next(new APINotFoundError(apiErrorParams));
+      }
+      else{
+        next(err);
+      }
     }
   }
 
