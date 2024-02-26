@@ -6,6 +6,7 @@
 # into 'jq' command
 
 # BEWARE OF TRAILING COMMAS IN FINAL ELEMENTS OF PAYLOADS! haha...
+# also if you include headers in curl flags, jq won't be able to parse
 
 ########## VARIABLES #########
 URL="http://127.0.0.1:4000/api"
@@ -46,10 +47,36 @@ POST_login_success_1() {
      "$URL/users/login"
 }
 
+POST_users_success1() {
+    payload='{
+        "firstName": "testCreateUser",
+        "lastName": "testCreateUser",
+        "email": "testCreateUser@test.com",
+        "password": "testcreatUserpassword"
+    }';
+
+    curl \
+     --include \
+     --cookie-jar 'cookies.txt' \
+     --request 'POST' \
+     --header 'Content-Type: application/json' \
+     --data "$payload" \
+     "$URL/users"
+}
+
 GET_users_success_1(){
     curl \
+	 --include \
      --request 'GET' \
-     "$URL/users/1" | jq
+     "$URL/users/1"
+
+}
+
+GET_users_failure_notFound1(){
+    curl \
+	 --include \
+     --request 'GET' \
+     "$URL/users/12321321313123213"
 
 }
 
@@ -98,7 +125,7 @@ PUT_users_failure_invalidFields1(){
 
     payload='{
         "chickens": "testUser1UpdatedSecond@test.com"
-    }'
+    }';
 
     curl \
      --include \
@@ -107,6 +134,36 @@ PUT_users_failure_invalidFields1(){
      --header 'Content-Type: application/json' \
      --data "$payload" \
      "$URL/users/1"
+}
+PUT_users_failure_invalidFields1(){
+
+    payload='{
+        "chickens": "testUser1UpdatedSecond@test.com"
+    }';
+
+    curl \
+     --include \
+     --cookie-jar 'cookies.txt' \
+     --request 'PUT' \
+     --header 'Content-Type: application/json' \
+     --data "$payload" \
+     "$URL/users/1"
+}
+
+PUT_users_failure_noUserExists1(){
+
+    payload='{
+        "email": "testUserPutNoSuchUser@test.com",
+		"firstName": "testUser1UpdatedSecondFirstName"
+    }'
+
+    curl \
+     --include \
+     --cookie-jar 'cookies.txt' \
+     --request 'PUT' \
+     --header 'Content-Type: application/json' \
+     --data "$payload" \
+     "$URL/users/123214154142"
 }
 
 
