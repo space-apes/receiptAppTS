@@ -2,7 +2,7 @@
 1. [Introduction](#Introduction)
 2. [Features](#features) 
 3. [Stack](#stack)
-4. [Future Improvements](#Future Improvements)
+4. [Future Improvements](#Future-Improvements)
 5. [How To Run](#how-to-run)
 
 # Introduction
@@ -70,7 +70,7 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
   - API documentation: swagger-ui-express
   - persisted data services: mysql accessed by node through mysql2 library
 
-# Future Improvements: 
+# Future Improvements
 - be completely contract driven instead of partially and generate all controller, validator, model code from contract
 - pull User, Transaction, Session, and ReceiptParsing services into their own micro-service instances with Dockerfiles and node images. reverse-proxy for monitoring, load-balancers for each service with horizontal scaling
 - further separate service layer into generic data retrieval layers and programatic business logic/processing layer. the data retrieval layer could handle retrieving and formatting data in some standardized way and the business logic layer could remain unchanged.
