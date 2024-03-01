@@ -13,21 +13,6 @@ URL="http://127.0.0.1:4000/api"
 
 ########## FUNCTIONS ########## 
 
-#POST_users_success_1() {
-#    email="testUser20@test.com"
-#    password="testUser20Password"
-#
-#    curl -X POST \ 
-#        "$URL/users" \
-#        --header 'Content-Type: application/json' \
-#        --data '
-#        {
-#            "email": "$email",
-#            "password": "$password"
-#        }' | jq
-#}
-#
-
 
 # make sure to check out the jwt with a jwt decoding tool and compare to the endpoint code
 # to see that fields are correct. a successful login should yield a non '-1' userId value
@@ -176,6 +161,58 @@ DELETE_users_success1(){
      --header 'Content-Type: application/json' \
      "$URL/users/1"
 }
+
+
+POST_transactions_success1() {
+    payload='{
+        "initiatorUserId": 8,
+        "businessName": "testBusiness",
+        "users": [
+            {
+                "firstName": "testUser",
+                "lastName": "testUser",
+                "userId": -1
+            } 
+        ],
+        "receiptItems": [
+            {
+                "itemName": "testItem",
+                "itemPrice": 0.00,
+                "username": "testuserS",
+                "userId": -1
+            } 
+        ]
+    }'
+
+    curl \
+     --include \
+     --cookie-jar 'cookies.txt' \
+     --request 'POST' \
+     --header 'Content-Type: application/json' \
+     --data "$payload" \
+     "$URL/transactions"
+}
+
+GET_transactions_success1() {
+
+    curl \
+     --include \
+     --cookie-jar 'cookies.txt' \
+     --request 'GET' \
+     --header 'Content-Type: application/json' \
+     "$URL/transactions/1"
+}
+
+GET_transactions-users_success1() {
+
+    curl \
+     --include \
+     --cookie-jar 'cookies.txt' \
+     --request 'GET' \
+     --header 'Content-Type: application/json' \
+     "$URL/transactions/user/3"
+}
+
 
 
 ########## EXECUTION ##########

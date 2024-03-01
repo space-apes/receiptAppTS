@@ -1,6 +1,6 @@
 import User from '../../types/user';
 
-interface UserDataServiceInterface{
+interface UserDataService{
     //returns userId
     create(firstName: string, lastName: string, email:string, password: string): Promise<number>;
     getByUserId(userId: number): Promise<User>;
@@ -9,4 +9,4 @@ interface UserDataServiceInterface{
     delete(userId: number): void;
 }
 
-export default UserDataServiceInterface;
+export default UserDataService;
