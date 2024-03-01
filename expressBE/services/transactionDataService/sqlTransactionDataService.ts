@@ -99,20 +99,24 @@ class SqlTransactionDataService implements TransactionDataService{
             WHERE t.transactionId = ?;
             `;
 
+            let dbVars = [transactionId];
+
             if (transactionId < 1){
                 throw new SqlTransactionDataServiceNotFoundError({
                         query: query,
-                        db: process.env.DB_DATABASE as string
+                        db: process.env.DB_DATABASE as string,
+                        dbVars: dbVars
                 });
             }
 
 
-            const [transactionRows] = await this.dbPool.execute(query, [transactionId]) as RowDataPacket[];
+            const [transactionRows] = await this.dbPool.execute(query, dbVars) as RowDataPacket[];
 
             if (transactionRows.length == 0){
                 throw new SqlTransactionDataServiceNotFoundError({
                         query: query,
-                        db: process.env.DB_DATABASE as string
+                        db: process.env.DB_DATABASE as string,
+                        dbVars: dbVars
                 });
             }
             else{
@@ -164,12 +168,15 @@ class SqlTransactionDataService implements TransactionDataService{
             WHERE tii.userId = ?);	
         `;
 
+        let dbVars = [userId];
+
 
         try {
             if (userId < 1){
                 throw new SqlTransactionDataServiceNotFoundError({
                         query: query,
-                        db: process.env.DB_DATABASE as string
+                        db: process.env.DB_DATABASE as string,
+                        dbVars: dbVars
                 });
             }
 
@@ -178,7 +185,8 @@ class SqlTransactionDataService implements TransactionDataService{
             if (transactionRows.length == 0){
                 throw new SqlTransactionDataServiceNotFoundError({
                         query: query,
-                        db: process.env.DB_DATABASE as string
+                        db: process.env.DB_DATABASE as string,
+                        dbVars: dbVars
                 });
             }
 
@@ -244,22 +252,26 @@ class SqlTransactionDataService implements TransactionDataService{
         WHERE transactionid = ?;
         `;
 
+        let dbVars = [transactionId];
+
         
         try {
 
             if (transactionId < 1){
                 throw new SqlTransactionDataServiceNotFoundError({
                         query: query,
-                        db: process.env.DB_DATABASE as string
+                        db: process.env.DB_DATABASE as string,
+                        dbVars: dbVars
                 });
             }
 
-            const deleteResult = await this.dbPool.execute(query, [transactionId]) as ResultSetHeader[];
+            const deleteResult = await this.dbPool.execute(query, dbVars) as ResultSetHeader[];
             
             if (deleteResult[0].affectedRows == 0 ) {
                 throw new SqlTransactionDataServiceNotFoundError({
                         query: query,
-                        db: process.env.DB_DATABASE as string
+                        db: process.env.DB_DATABASE as string,
+                        dbVars: dbVars
                 });
             }
         return; 

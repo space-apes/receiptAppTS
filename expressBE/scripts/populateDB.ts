@@ -1,12 +1,19 @@
 //const mysql = require('mysql2/promise');
 import mysql from 'mysql2/promise';
 
-const {createUser} = require('./library/users'); 
-const {createTransaction} = require('./library/transactions'); 
+import ReceiptItem from '../types/receiptItem';
+import SqlUserDataService from '../services/userDataService/sqlUserDataService';
+import SqlTransactionDataService from '../services/transactionDataService/sqlTransactionDataService';
+import { exit } from 'process';
+
 
 require('dotenv').config();
 
 async function main() {
+
+	const sqlUserDataService = new SqlUserDataService();
+	const sqlTransactionDataService = new SqlTransactionDataService();
+
 
     var dbPool = mysql.createPool({
         host: process.env.DB_URL,
@@ -99,80 +106,90 @@ async function main() {
 		}, 
 	];
 
-	testUsers.forEach((u) =>{
-		createUser(u.email, u.password, u.firstName, u.lastName); 
-	});
+	const testUserPromises = testUsers.map( async (u) => await sqlUserDataService.create(u.firstName, u.lastName, u.email, u.password ));
+	
+	await Promise.all(testUserPromises);
 
-	console.log('added test users...');
+
+	console.log('created test users...');
 
 	const testTransactions = [
 		{
 			initiatorUserId: 1, 
 			businessName: "business1",
 			receiptItemsArray: [
-				[
-					1,
-					"hardcodedusername1", 
-					"tacos",
-					12.99
-				],
-				[
-					3,
-					"hardcodedusername1", 
-					"ice cream",
-					5.75
-				],
-				[
-					-1,
-					"JohnnyB Guest", 
-					"Beer",
-					4.00
-				],
-
-			]
+				{
+					userId: 1,
+					username: "hardcodedusername1", 
+					itemName: "tacos",
+					itemPrice: 12.99
+				} as ReceiptItem,
+				{
+					userId: 3,
+					username: "hardcodedusername1", 
+					itemName: "ice cream",
+					itemPrice: 5.75
+				} as ReceiptItem,
+				{
+					userId: -1,
+					username: "JohnnyB Guest", 
+					itemName: "Beer",
+					itemPrice: 4.00
+				} as ReceiptItem,
+			] as [ReceiptItem, ...ReceiptItem[]]
 		},
 		{
 			initiatorUserId: 3, 
 			businessName: "business2",
 			receiptItemsArray: [
-				[
-					3,
-					"hardcodedusername1", 
-					"Chicken Nuggets",
-					10.99
-				],
-				[
-					-1,
-					"SallyB Guest", 
-					"Tequila Shot",
-					6.00
-				],
-				[
-					4,
-					"hardcodedusername1", 
-					"vegetables",
-					4.00
-				],
-				[
-					4,
-					"hardcodedusername1", 
-					"pita bread",
-					3.50
-				]
-
-			]
+				{
+					userId: 3,
+					username: "hardcodedusername1", 
+					itemName: "Chicken Nuggets",
+					itemPrice: 10.99
+				} as ReceiptItem,
+				{
+					userId: -1,
+					username: "SallyB Guest", 
+					itemName: "Tequila Shot",
+					itemPrice: 6.00
+				} as ReceiptItem,
+				{
+					userId: 4,
+					username: "hardcodedusername1", 
+					itemName: "vegetables",
+					itemPrice: 4.00
+				} as ReceiptItem,
+				{
+					userId: 4,
+					username: "hardcodedusername1", 
+					itemName: "pita bread",
+					itemPrice: 3.50
+				} as ReceiptItem
+			] as [ReceiptItem, ...ReceiptItem[]]
 		},
 	];
 
 
-	testTransactions.forEach((t)=>{
-		createTransaction(t.initiatorUserId, t.businessName, t.receiptItemsArray); 	
+	const testTransactionPromises = testTransactions.map( async (t) =>{
+		return await sqlTransactionDataService.create(
+			{
+				initiatorUserId: t.initiatorUserId,
+				businessName: t.businessName,
+				receiptItems: t.receiptItemsArray
+			}
+		); 	
 	});
+
+	await Promise.all(testTransactionPromises);
+	
 
 	console.log('created test transactions...'); 
 
     await dbPool.end();
-    
+
+	exit();
+
 }
 
 main();
