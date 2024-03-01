@@ -1,89 +1,113 @@
-# table of contents 
-TODO
+# Table of Contents 
+1. [Introduction](#Introduction)
+2. [Features](#features) 
+3. [Stack](#stack)
+4. [Future Improvements](#Future-Improvements)
+5. [How To Run](#how-to-run)
 
 # Introduction
-this is my dream BE project with the goal to minimize software maintenance costs and developer headaches.  
+This is my dream BE project with the goals of minimizing software maintenance costs, developer headaches, and experimenting with
+new technologies, architectures, and project management tools. It is currently _STILL IN DEVELOPMENT_. 
 
-single-language stack: typescript react FE and typescript express BE. less context switching when doing full-stack work. FE and BE teams can communicate more clearly and understand each other's needs.  
+ReceiptApp is a service for groups of people who need a quick and easy way to split the bill at places like restaurants or bars. Simply scan a receipt which will be parsed by an OCR, send a unique URL link to your friends, then collectively select who will pay for which items will in real time. Once the purchase has been submitted, registered users have the ability to review previous receipts. In the future, payments will also be handled automatically by 3rd party payment APIs (stripe, venmo, etc). 
 
-contract driven API development: single source of truth using openAPI 3.0 specification, generate as much code by trusted open source libraries as possible over writing my own solutions. language/framework agnostic and can switch technologies if needed. 
+# Features
+- single-language stack 
+  - typescript react FE and typescript express BE.
+  - less context switching when doing full-stack work.
+  - FE and BE teams can communicate more clearly and understand each other's needs.  
 
-test-driven: increase coverage, eliminate bias of writing tests to fit code that has already been written. 
+- layered service-based architecture: 
+  - controller/API layer and service layer 
+  - service layer for anything outside of synchronous operation with different implementations for different technologies
+  - each service conforms to an interface and can be swapped in without affecting other layers 
+  - custom error/exception handling flow for each layer
+  - can easily be converted to micro-service architecture
 
-12 factor app: adheres to as much as possible.... TODO
+- contract driven API development
+  - single source of truth using openAPI 3.0 specification
+  - generate as much code by trusted open source libraries as possible over writing my own solutions (EX: API validation)
+  - language/framework agnostic and can switch technologies if needed
+  - documentation generated dynamically as new features added
 
-3 layer architecture: controller/API layer, data store service layer, business logic layer. each can be swapped with minimal effect on other layers. each layer can be tested independently and together. 
+- test-driven development: 
+  - increase coverage
+  - eliminate bias of writing tests to fit code that has already been written
+  - reduce refactoring effort
+
+- followed 12 factor app guidelines as much as possible
+
+- experiment with avoiding ORM for SQL based services
+  - for new hires, the syntax of SQL is well-known instead of needing to relearn operations/syntax of particular ORM
+  - debugging BE issues might be easier because the code is closer to actual queries instead of through another layer 
+  - i would say this experiment was only a partial success:  i wished for an ORM many times!
+
+- experiment with sockets and asynchronous communication
+
+- experiment with using github's built-in project management tools 
+  - github Projects for tickets, work delegation: [ReceiptAppTS Project Page](https://github.com/users/space-apes/projects/7)
+  - github Wiki for documentation: [ReceiptAppTS Wiki Page](https://github.com/space-apes/receiptAppTS/wiki)
+ 
+- experiment with JWTs 
+  - 'session' data and auth data stored in JWTs
+  - added security
+    - http-only cookies that can not be read directly by code
+	- quick expiration
+	- validation of JWTs to check for data integrity
+  - allow session to be sticky without needing make expensive service calls
 
 
-experiment with sockets and asynchronous communication 
-experiment with enterprise level work flow
-experiment with avoiding ORM
+# Stack 
+- all node/typescript
+- FE
+  - UI: react.js written in typescript 
+  - asynchronous realtime communication: socket.io
+- BE 
+  - API: express.js written in typescript for API
+  - JWT: jsonwebtoken
+  - password hashing: Argon2
+  - API validation: express-openapi-validator
+  - API documentation: swagger-ui-express
+  - persisted data services: mysql accessed by node through mysql2 library
 
-
-# stack 
-
-# features 
-- experimented with git projects workflow for ticketing / work delegation, task breakdown, version control, tracking
-  - https://github.com/users/space-apes/projects/7/
-- contract-driven api development using openAPI 3
-  - spec for each endpoint written first in comments above controller defsnition 
-  - specs for endpoints parsed by swagger-jsdoc and used to generate expressBE/openApiSpec.json
-  - the json is used to generate validation middleware using express-openapi-validator
-  - the json also used to generate API documentation using express-ui
-  - the next API i build i would like to start completely from opanAPI spec and generate everything else 
-- custom Errors, APIError handling flow, synchronous and asynchronous error handling flow 
-- 
-- test driven 
-  - TODO 
-- asynchronous communication through sockets 
-  - the whole process of users identifying which charges belong to them happens in real time 
-  - TODO
-- authentication and authorization and user session as stateless as possible using JWTs
-  - TODO
-- non-MVC
-  - i love MVC pattern but i wanted to exercise...
-  - TODO
-
-# future improvements: 
+# Future Improvements
 - be completely contract driven instead of partially and generate all controller, validator, model code from contract
 - pull User, Transaction, Session, and ReceiptParsing services into their own micro-service instances with Dockerfiles and node images. reverse-proxy for monitoring, load-balancers for each service with horizontal scaling
-- further separate service layer into generic data retrieval layers and programatic business logic/processing layer. the data retrieval layer could handle retrieving and formatting data in some standardized way and the business logic layer could remain unchanged. 
+- further separate service layer into generic data retrieval layers and programatic business logic/processing layer. the data retrieval layer could handle retrieving and formatting data in some standardized way and the business logic layer could remain unchanged.
+- integration with third party payment APIs 
 
 
-# how to run the app
+# How To Run
 1. clone entire repo
-2. install dependencies by running 'npm install' in both 
-3. install mySQL server locally, note credentials, URL, db   
+2. install dependencies by running 'npm install' in both FE and BE directories
+3. install mySQL server locally, or have a mySQL server available. note credentials, URL, db   
 4. Create dev database on mysql server
-	- log-in to mysql server via mysql client (DBeaver)
+	- log-in to mysql server via mysql client (EX: DBeaver)
 	- MySQL Script:
 	```
-	CREATE DATABASE receiptAppDev
+	CREATE DATABASE receiptAppDev;
 	```
 3. create .env files 
-  - BE: needs fields:
-    - String: ENVIRONMENT (set to 'prod' or 'dev' for now) this will set CORS hosts
-    - Number: EXPRESS_PORT
-    - String: EXPRESS_BASE_URL #ex: https://127.0.0.1
-    - string: EXPRESS_URL_PATH_PREFIX #ex: /api
+  - BE: within BE directory create a file named .env fields and values:
+    - String: NODE_ENV # ex: 'dev', 'local', 'prod'
     - String[]: ALLOWED_HOSTS
     - String: JWT_SECRET # arbitrary random string
-    - String: DB_DATABASE
-    - String: DB_URL
-    - String: DB_USER
+    - String: DB_DATABASE # ex: 'receiptAppDev'
+    - String: DB_URL # ex 'localhost'
+    - String: DB_USER 
     - String: DB_PASSWORD 
 
-  - FE needs fields: 
+  - FE: within FE directory create file named .env with fields and values: 
     - String: BE_URL
     - ...
 
-4. run BE population script
-  - npx ts-node populateDB.ts
+4. from BE directory, run BE population script
+  - `npm run populateDB`
+  - (you can also run `npm run clearDB` to reset DB to starting state)
 
-5. start up BE server 
-  - cd expressReceiptBE 
-  - npm start 
-6. start up FE server 
-  - cd react-receipt-fe
-  - npm start 
+5. start up BE server from BE directory
+  - `npm start` 
+6. start up FE server from FE directory
+  - `npm start` 
 7. should see the socket.io console.log messages for 'user connected' and updateItemUser
+8. navigate browser to FE address or `{BE address}/api-docs` to see openAPI documentation

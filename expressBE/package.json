@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.ts",
   "scripts": {
+    "populateDB": "npx ts-node ./scripts/populateDB.ts",
+    "clearDB": "npx ts-node ./scripts/dropTables.ts",
     "start": "node ./node_modules/nodemon/bin/nodemon.js index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

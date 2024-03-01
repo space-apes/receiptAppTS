@@ -42,12 +42,15 @@ class SqlUserDataService implements UserDataService{
             WHERE u.email = ?
             `;
 
-            const [selectRows] = await this.dbPool.execute(selectQuery, [email]) as RowDataPacket[];
+            let dbVars = [email];
+
+            const [selectRows] = await this.dbPool.execute(selectQuery, dbVars) as RowDataPacket[];
             
             if (selectRows.length > 0){
                 throw new SqlUserDataServiceAlreadyExistsError({
                         query: selectQuery,
-                        db: process.env.DB_DATABASE as string
+                        db: process.env.DB_DATABASE as string,
+                        dbVars: dbVars
                 });
             }
 
@@ -86,12 +89,15 @@ class SqlUserDataService implements UserDataService{
             limit 1;
             `;
 
-            const [rows] = await this.dbPool.execute(retrieveQuery, [userId]) as RowDataPacket[];
+            let dbVars : any[] = [userId];
+
+            const [rows] = await this.dbPool.execute(retrieveQuery, dbVars) as RowDataPacket[];
 
             if (rows.length == 0){
                 throw new SqlUserDataServiceNotFoundError({
                         query: retrieveQuery,
-                        db: process.env.DB_DATABASE as string
+                        db: process.env.DB_DATABASE as string,
+                        dbVars: dbVars
                 });
             }
             else{
@@ -124,12 +130,15 @@ class SqlUserDataService implements UserDataService{
             WHERE u.email = ?
             `;
 
-            const [rows] = await this.dbPool.execute(retrieveQuery, [email]) as RowDataPacket[];
+            let dbVars = [email];
+
+            const [rows] = await this.dbPool.execute(retrieveQuery, dbVars) as RowDataPacket[];
 
             if (rows.length == 0){
                 throw new SqlUserDataServiceNotFoundError({
                         query: retrieveQuery,
-                        db: process.env.DB_DATABASE as string
+                        db: process.env.DB_DATABASE as string,
+                        dbVars: dbVars
                 });
             }
             else{
@@ -216,14 +225,17 @@ class SqlUserDataService implements UserDataService{
         DELETE from users u  
         WHERE u.userId = ? 
         `;
+
+        let dbVars = [userId]
         
         try {
-            const deleteResult = await this.dbPool.execute(deleteQuery, [userId]) as ResultSetHeader[];
+            const deleteResult = await this.dbPool.execute(deleteQuery, dbVars) as ResultSetHeader[];
             
             if (deleteResult[0].affectedRows == 0 ) {
                 throw new SqlUserDataServiceNotFoundError({
                         query: deleteQuery,
-                        db: process.env.DB_DATABASE as string
+                        db: process.env.DB_DATABASE as string,
+                        dbVars: dbVars
                 });
             }
 

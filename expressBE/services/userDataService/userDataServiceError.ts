@@ -48,21 +48,24 @@ abstract class UserDataServiceAlreadyExistsError extends UserDataServiceError {
 
 class SqlUserDataServiceNotFoundError extends UserDataServiceNotFoundError {
     private readonly _query: string; 
-    private readonly _db: string; 
+    private readonly _db: string;
+    private readonly _dbVars: any[]
 
-    constructor(params: {query: string, db: string, logging?: boolean}, message?: string){
+    constructor(params: {query: string, db: string, dbVars: any[], logging?: boolean}, message?: string){
         let logging : boolean =  params.logging || true;        
         super(logging, message || "SqlUserDataServiceNotFoundError");
         Object.setPrototypeOf(this, SqlUserDataServiceNotFoundError.prototype);
 
         this._query = params.query;
         this._db = params.db;
+        this._dbVars = params.dbVars
     }
 
     get context() : {[key: string]: any}{
         return {
             query: this._query,
-            db:  this._db
+            db:  this._db,
+            dbVars: this._dbVars
         };
     }
 }
@@ -71,20 +74,23 @@ class SqlUserDataServiceNotFoundError extends UserDataServiceNotFoundError {
 class SqlUserDataServiceAlreadyExistsError extends UserDataServiceAlreadyExistsError {
     private readonly _query: string; 
     private readonly _db: string; 
+    private readonly _dbVars: any[]
 
-    constructor(params: {query: string, db: string, logging?: boolean}, message?: string){
+    constructor(params: {query: string, db: string, dbVars: any[], logging?: boolean}, message?: string){
         let logging : boolean =  params.logging || true;        
         super(logging, message || "SqlUserDataServiceAlreadyExistsError");
         Object.setPrototypeOf(this, SqlUserDataServiceAlreadyExistsError.prototype);
 
         this._query = params.query;
         this._db = params.db;
+        this._dbVars = params.dbVars;
     }
 
     get context() : {[key: string]: any}{
         return {
             query: this._query,
-            db:  this._db
+            db:  this._db,
+            dbVars: this._dbVars
         };
     }
 }

@@ -48,21 +48,24 @@ abstract class TransactionDataServiceAlreadyExistsError extends TransactionDataS
 
 class SqlTransactionDataServiceNotFoundError extends TransactionDataServiceNotFoundError {
     private readonly _query: string; 
-    private readonly _db: string; 
+    private readonly _db: string;
+    private readonly _dbVars: any[];
 
-    constructor(params: {query: string, db: string, logging?: boolean}, message?: string){
+    constructor(params: {query: string, db: string, dbVars: any[], logging?: boolean}, message?: string){
         let logging : boolean =  params.logging || true;        
         super(logging, message || "SqlTransactionDataServiceNotFoundError");
         Object.setPrototypeOf(this, SqlTransactionDataServiceNotFoundError.prototype);
 
         this._query = params.query;
         this._db = params.db;
+        this._dbVars = params.dbVars
     }
 
     get context() : {[key: string]: any}{
         return {
             query: this._query,
-            db:  this._db
+            db:  this._db,
+            dbVars: this._dbVars
         };
     }
 }
@@ -70,21 +73,24 @@ class SqlTransactionDataServiceNotFoundError extends TransactionDataServiceNotFo
 
 class SqlTransactionDataServiceAlreadyExistsError extends TransactionDataServiceAlreadyExistsError {
     private readonly _query: string; 
-    private readonly _db: string; 
+    private readonly _db: string;
+    private readonly _dbVars: any[];
 
-    constructor(params: {query: string, db: string, logging?: boolean}, message?: string){
+    constructor(params: {query: string, db: string, dbVars: any[], logging?: boolean}, message?: string){
         let logging : boolean =  params.logging || true;        
         super(logging, message || "SqlTransactionDataServiceAlreadyExistsError");
         Object.setPrototypeOf(this, SqlTransactionDataServiceAlreadyExistsError.prototype);
 
         this._query = params.query;
         this._db = params.db;
+        this._dbVars = params.dbVars
     }
 
     get context() : {[key: string]: any}{
         return {
             query: this._query,
-            db:  this._db
+            db:  this._db,
+            dbVars: this._dbVars
         };
     }
 }
