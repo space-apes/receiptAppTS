@@ -45,8 +45,8 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
 - experiment with sockets and asynchronous communication
 
 - experiment with using github's built-in project management tools 
-  - github Projects for tickets, work delegation
-  - github Wiki for documentation
+  - github Projects for tickets, work delegation: [ReceiptAppTS Project Page](https://github.com/users/space-apes/projects/7)
+  - github Wiki for documentation: [ReceiptAppTS Wiki Page](https://github.com/space-apes/receiptAppTS/wiki)
  
 - experiment with JWTs 
   - 'session' data and auth data stored in JWTs
