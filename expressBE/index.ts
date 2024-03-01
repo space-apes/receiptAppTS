@@ -11,8 +11,13 @@ import {
     displayRequestsMiddleware,
     customErrorHandlerMiddleware
 } from './middleware';
-import {userRouter} from './routes';
-import { AjvOptions } from 'express-openapi-validator/dist/framework/ajv/options';
+import {
+    usersRouter,
+    transactionsRouter
+} from './routes';
+
+//services selected based on environment variables 
+//from ./sqlSelector.ts
 
 
 dotenv.config(); 
@@ -57,7 +62,10 @@ app.get('/', (req:Request, res:Response) => {
 });
 
 //users routes
-app.use('/api/users', [express.json(), userRouter]); 
+app.use('/api/users', [express.json(), usersRouter]); 
+
+//transactions routes
+app.use('/api/transactions', [express.json(), transactionsRouter]); 
 
 //openAPI documentation routes
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openAPIDocJSONObj));

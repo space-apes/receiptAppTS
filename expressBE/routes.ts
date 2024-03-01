@@ -1,30 +1,37 @@
 import {Router} from 'express'; 
 import {
     registerUser,
-    loginGetToken,
     getUser,
     updateUser,
     deleteUser
-} from './controllers/usersController'; 
+} from './controllers/usersController';
+import {
+    createTransaction,
+    getTransactionByTransactionId,
+    getTransactionsByUserId
+} from './controllers/transactionsController';
 
 /*** SESSION ROUTES ***/
 //this should definitely be a service in case diff technologies are used
 //get new token
+//sessionRouter.post('/login', loginGetToken);
 //verify token 
 //no refresh token endpoint. just get a new token. 
 
 /***  USER ROUTES ***/ 
-const userRouter = Router();
+const usersRouter = Router();
 
-userRouter.post('', registerUser);
-userRouter.get('/:userId', getUser);
-userRouter.post('/login', loginGetToken);
-userRouter.put('/:userId', updateUser);
-userRouter.delete('/:userId', deleteUser);
+usersRouter.post('', registerUser);
+usersRouter.get('/:userId', getUser);
+usersRouter.put('/:userId', updateUser);
+usersRouter.delete('/:userId', deleteUser);
 
 
 /***  TRANSACTION ROUTES ***/
-const transactionRouter = Router(); 
+const transactionsRouter = Router();
+transactionsRouter.post('', createTransaction);
+transactionsRouter.get('/:transactionId', getTransactionByTransactionId);
+transactionsRouter.get('/user/:userId', getTransactionsByUserId);
 
 //create transaction 
 //get transactions from userId 
@@ -33,6 +40,6 @@ const transactionRouter = Router();
 
 
 export {
-    userRouter, 
-    transactionRouter
+    usersRouter, 
+    transactionsRouter
 };

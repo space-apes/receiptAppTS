@@ -1,18 +1,14 @@
 import {Request, Response, NextFunction} from 'express';
 import {HttpError} from 'express-openapi-validator/dist/framework/types';
 import {APIError} from './errors/apiError';
+import { error } from 'console';
 
 const displayRequestsMiddleware  = (req:Request, res: Response, next:NextFunction)=>{
 	console.log(`request monitoring middleware: path: ${req.path}, method: ${req.method}`);
 	next();
 };
 
-/*
-	if API error
-		respond 
-	if other error	
-		respond with 500
-*/
+
 const customErrorHandlerMiddleware  = (err: HttpError, req:Request, res: Response, next:NextFunction)=>{
 
 	if (err instanceof APIError){
@@ -24,6 +20,7 @@ const customErrorHandlerMiddleware  = (err: HttpError, req:Request, res: Respons
 			responseCode: ${err.responseCode}
 			context: ${JSON.stringify(err.context)}
 			dateTime: ${err.dateTime}
+			stack: ${err.stack}
 			`);
 
 			return res.status(err.responseCode || 500).json({
@@ -33,8 +30,8 @@ const customErrorHandlerMiddleware  = (err: HttpError, req:Request, res: Respons
 	}
 	return res.status(err.status || 500).json({
 		message: err.message,
-		error: err.errors
-	})
+		error: err.errors,
+	});
 };
 
 /* 

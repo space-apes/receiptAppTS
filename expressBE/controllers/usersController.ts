@@ -2,8 +2,8 @@ import {Request, Response, NextFunction} from 'express';
 import {sign, verify} from 'jsonwebtoken'; 
 import {getRandomRoomName} from '../library/socket';
 import User from '../types/user'; 
-import UserDataServiceInterface from '../services/userDataService/userDataServiceInterface';
-import SqlUserDataService from '../services/userDataService/sqlUserDataService';
+import UserDataService from '../services/userDataService/userDataService';
+import {getUserDataService} from '../serviceSelector';
 import { 
   UserDataServiceAlreadyExistsError,
   UserDataServiceNotFoundError
@@ -12,36 +12,18 @@ import {
   APINotFoundError,
   APIAlreadyExistsError
 } from '../errors/apiError';
+import dotenv from 'dotenv';
+import {dbPool} from '../db';
 
- import dotenv from 'dotenv';
-
-const argon2 = require('argon2');
-const { dbPool } = require('../db');
 
 dotenv.config(); 
+const argon2 = require('argon2');
+
+//get UserDataService based on environment 
+const userDataService : UserDataService = getUserDataService(); 
 
 
-
-//determine which userData service to use based on the environment
-//default case is SqlUserData Service because must assign value to global
-//THIS WILL EVENTUALLY BE DONE IN INDEX.TS AT TOP LEVEL FOR EACH SERVICE
-//FOR VISIBILITY
-//will make it the inMemoryUserDataService soon
-
-let userDataService: UserDataServiceInterface = new SqlUserDataService();
-
-switch (process.env.NODE_ENV){
-  //case 'local': 
-  //  userDataService = new InMemoryUserDataService(); 
-  case 'dev': 
-    userDataService = new SqlUserDataService();
-    break;
-  default: 
-    userDataService = new SqlUserDataService(); 
-}
-
-
-
+/*
 const loginGetToken = async (req:Request,res:Response, next: NextFunction) => {
   const {email, password} = req.body; 
 
@@ -102,6 +84,7 @@ const loginGetToken = async (req:Request,res:Response, next: NextFunction) => {
     console.log(err);
   }
 }
+*/
 
 // to kickstart *s on each line in vscode, start comment with /** 
 
@@ -412,7 +395,6 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
 export {
   getUser,
   registerUser,
-  loginGetToken,
   updateUser,
   deleteUser
 };

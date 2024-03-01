@@ -1,7 +1,8 @@
 import User from '../../types/user';
-import UserDataServiceInterface from './userDataServiceInterface';
+import UserDataService from './userDataService';
 import {
-    SqlUserDataServiceNotFoundError, SqlUserDataServiceAlreadyExistsError, UserDataServiceAlreadyExistsError
+    SqlUserDataServiceNotFoundError, 
+    SqlUserDataServiceAlreadyExistsError, 
 } from './userDataServiceError';
 import mysql from 'mysql2/promise';
 import {ResultSetHeader, RowDataPacket} from 'mysql2';
@@ -9,7 +10,7 @@ import argon2 from 'argon2';
 
 require('dotenv').config();
 
-class SqlUserDataService implements UserDataServiceInterface{
+class SqlUserDataService implements UserDataService{
 
      dbPool: mysql.Pool;
 
@@ -72,7 +73,7 @@ class SqlUserDataService implements UserDataServiceInterface{
     /**
      * retrieve user data from userId 
      * 
-     * @param userId 
+     * @param number userId 
      * @returns Promise<User>
      */
 
@@ -82,6 +83,7 @@ class SqlUserDataService implements UserDataServiceInterface{
             let retrieveQuery = `
             SELECT * FROM users u
             WHERE u.userId = ?
+            limit 1;
             `;
 
             const [rows] = await this.dbPool.execute(retrieveQuery, [userId]) as RowDataPacket[];
@@ -105,6 +107,7 @@ class SqlUserDataService implements UserDataServiceInterface{
             throw err; 
         }
     }
+
 
     /**
      * retrieve user data from userId 
