@@ -105,11 +105,9 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
   - `npm run populateDB`
   - (you can also run `npm run clearDB` to reset DB to starting state)
 
-5. start up BE server 
-  - cd expressReceiptBE 
+5. start up BE server from BE directory
   - `npm start` 
-6. start up FE server 
-  - cd react-receipt-fe
+6. start up FE server from FE directory
   - `npm start` 
 7. should see the socket.io console.log messages for 'user connected' and updateItemUser
 8. navigate browser to FE address or `{BE address}/api-docs` to see openAPI documentation
