@@ -89,9 +89,16 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
 	```
 3. create .env files 
   - BE: within BE directory create a file named .env fields and values:
-    - String: NODE_ENV # ex: 'dev', 'local', 'prod'
+    - String: NODE_ENV # ex: 'dev', 'local', 'prod'. use 'dev' for initial population
     - String[]: ALLOWED_HOSTS
+    - EXPRESS_PORT: # whatever port you want express server to run on 
     - String: JWT_SECRET # arbitrary random string
+
+    - String: DB_DATABASE # ex: 'receiptAppDev'
+    - String: DB_URL # ex 'localhost'
+    - String: DB_USER 
+    - String: DB_PASSWORD 
+
     - String: DB_DATABASE # ex: 'receiptAppDev'
     - String: DB_URL # ex 'localhost'
     - String: DB_USER 

@@ -14,13 +14,13 @@ class SqlUserDataService implements UserDataService{
 
      dbPool: mysql.Pool;
 
-    constructor(){
+    constructor(params: {host: string, user: string, password: string, database: string, connectionLimit: number}){
         this.dbPool = mysql.createPool({
-            host: process.env.DB_URL,
-            user: process.env.DB_USER, 
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_DATABASE, 
-            connectionLimit: 10
+            host: params.host,
+            user: params.user, 
+            password: params.password,
+            database: params.database, 
+            connectionLimit: params.connectionLimit
         }); 
     }
 
