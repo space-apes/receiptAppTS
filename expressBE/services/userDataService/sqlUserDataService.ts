@@ -8,7 +8,6 @@ import mysql from 'mysql2/promise';
 import {ResultSetHeader, RowDataPacket} from 'mysql2';
 import argon2 from 'argon2';
 
-require('dotenv').config();
 
 class SqlUserDataService implements UserDataService{
 

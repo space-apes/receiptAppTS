@@ -31,7 +31,7 @@ async function populateDB(dbPool: mysql.Pool) {
         dateRegistered datetime,
         PRIMARY KEY(userId)
     );
-    `
+    `;
 
     const createTransactionsQuery = `
     CREATE TABLE transactions (
@@ -41,7 +41,7 @@ async function populateDB(dbPool: mysql.Pool) {
         dateCreated datetime NOT NULL, 
         PRIMARY KEY(transactionId)
     );
-    `
+    `;
 
     const createTransactionsItemsQuery = `
     CREATE TABLE transactionsItems (
@@ -54,21 +54,7 @@ async function populateDB(dbPool: mysql.Pool) {
         dateCreated datetime NOT NULL DEFAULT NOW(), 
         PRIMARY KEY(transactionsItemsId)
     );
-    `
-
-    
-    await Promise.all([
-        dbPool.execute(createUsersQuery),
-         dbPool.execute(createTransactionsQuery),
-         dbPool.execute(createTransactionsItemsQuery)
-        ]
-    );
-
-    console.log('created users table...'); 
-    console.log('created transactions table...');
-    console.log('created transactionsItems table...'); 
-
-
+    `;
 	const testUsers = [
 		{
 			email: "testUser1@test.com",
@@ -101,6 +87,20 @@ async function populateDB(dbPool: mysql.Pool) {
 			lastName : "tester"
 		}, 
 	];
+
+    
+    await Promise.all([
+        dbPool.execute(createUsersQuery),
+         dbPool.execute(createTransactionsQuery),
+         dbPool.execute(createTransactionsItemsQuery)
+        ]
+    );
+
+    console.log('created users table...'); 
+    console.log('created transactions table...');
+    console.log('created transactionsItems table...'); 
+
+
 
 	const testUserPromises = testUsers.map( async (u) => await sqlUserDataService.create(u.firstName, u.lastName, u.email, u.password ));
 	
@@ -215,7 +215,7 @@ async function getDBPool(): Promise<mysql.Pool>{
 				connectionLimit: process.env.DEV_CONNECTIONLIMIT
 			};
 			break;
-		case('local'):
+		case('test'):
 			dbParams = {
 				host: process.env.TEST_DB_URL,
 				user: process.env.TEST_DB_USER,

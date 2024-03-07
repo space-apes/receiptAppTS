@@ -13,7 +13,6 @@ import {
   APIAlreadyExistsError
 } from '../errors/apiError';
 import dotenv from 'dotenv';
-import {dbPool} from '../db';
 
 
 dotenv.config(); 

@@ -1,4 +1,4 @@
-import {getDBPool, dropTables} from './populationUtils';
+import {getDBPool, dropTables} from './sqlPopulationUtils';
 
 //CAN SET YOUR TABLES HERE
 const tablesToDrop: string[] = [

@@ -20,15 +20,18 @@ import UserDataService from './services/userDataService/userDataService';
 import SqlUserDataService from './services/userDataService/sqlUserDataService';
 import TransactionDataService from './services/transactionDataService/transactionDataService';
 import SqlTransactionDataService from './services/transactionDataService/sqlTransactionDataService';
+import dotenv from 'dotenv';
+dotenv.config();
 
 function getUserDataService(): UserDataService{
+
 
     let userDataService : UserDataService;
 
     switch (process.env.NODE_ENV){
     //case local: 
     //  userDataService = new InMemoryUserDataService(); 
-    case 'test': 
+    case 'test':
         userDataService = new SqlUserDataService({
             host: process.env.TEST_DB_URL as string,
             user: process.env.TEST_DB_USER as string,
