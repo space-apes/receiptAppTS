@@ -11,7 +11,7 @@ import argon2 from 'argon2';
 
 class SqlUserDataService implements UserDataService{
 
-     dbPool: mysql.Pool;
+     private dbPool: mysql.Pool;
 
     constructor(params: {host: string, user: string, password: string, database: string, connectionLimit: number}){
         this.dbPool = mysql.createPool({
@@ -21,6 +21,10 @@ class SqlUserDataService implements UserDataService{
             database: params.database, 
             connectionLimit: params.connectionLimit
         }); 
+    }
+
+    async close() {
+        this.dbPool.end()
     }
 
     /**
@@ -62,7 +66,7 @@ class SqlUserDataService implements UserDataService{
             VALUES (?, ?, ?, ?, NOW());
             `; 
             const insertResult = await this.dbPool.execute(insertQuery, [firstName,lastName,email, hash]) as ResultSetHeader[];
-            
+
             return insertResult[0].insertId;
         
         }

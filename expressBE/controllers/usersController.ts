@@ -18,8 +18,6 @@ import dotenv from 'dotenv';
 dotenv.config(); 
 const argon2 = require('argon2');
 
-//get UserDataService based on environment 
-const userDataService : UserDataService = getUserDataService(); 
 
 
 /*
@@ -155,9 +153,14 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
   const {firstName, lastName, email, password} = req.body;
 
     try{ 
+
+      //get UserDataService based on environment 
+      const userDataService : UserDataService = await getUserDataService(); 
       
       let newUserId = await userDataService.create(firstName, lastName, email, password); 
-  
+
+      userDataService.close && userDataService.close();
+      
       return res.status(201).json(
         {
           userId: newUserId

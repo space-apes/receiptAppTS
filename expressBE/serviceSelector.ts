@@ -23,7 +23,7 @@ import SqlTransactionDataService from './services/transactionDataService/sqlTran
 import dotenv from 'dotenv';
 dotenv.config();
 
-function getUserDataService(): UserDataService{
+const getUserDataService = async ():Promise<UserDataService> => {
 
 
     let userDataService : UserDataService;
@@ -62,7 +62,7 @@ function getUserDataService(): UserDataService{
     return userDataService;
 }
 
-function getTransactionDataService(): TransactionDataService{
+const getTransactionDataService = async ():Promise<TransactionDataService> => {
 
     let transactionDataService : TransactionDataService;
 

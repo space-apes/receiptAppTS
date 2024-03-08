@@ -8,10 +8,9 @@ describe("Users controller", ()=>{
                 .get("/api/users/1")
                 .set("content-type", "application/json");
 
-                console.log(response.error);
-            
             expect(response.status).toBe(200);
         });
 
     });
 });
+

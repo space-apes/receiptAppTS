@@ -8,7 +8,13 @@
 import mysql from 'mysql2/promise';
 import ReceiptItem from '../types/receiptItem';
 import {getUserDataService, getTransactionDataService} from '../serviceSelector'
-import { exit } from 'process';
+
+//set tables here!
+const tablesToDrop: string[] = [
+        "users",
+        "transactions",
+        "transactionsItems"
+    ];
 
 
 require('dotenv').config();
@@ -16,8 +22,8 @@ require('dotenv').config();
 
 async function populateDB(dbPool: mysql.Pool) {
 
-	const sqlUserDataService = getUserDataService();
-	const sqlTransactionDataService = getTransactionDataService();
+	const sqlUserDataService = await getUserDataService();
+	const sqlTransactionDataService = await getTransactionDataService();
 
 
     const createUsersQuery = `
@@ -55,6 +61,8 @@ async function populateDB(dbPool: mysql.Pool) {
         PRIMARY KEY(transactionsItemsId)
     );
     `;
+	
+
 	const testUsers = [
 		{
 			email: "testUser1@test.com",
@@ -91,24 +99,30 @@ async function populateDB(dbPool: mysql.Pool) {
     
     await Promise.all([
         dbPool.execute(createUsersQuery),
-         dbPool.execute(createTransactionsQuery),
-         dbPool.execute(createTransactionsItemsQuery)
+        dbPool.execute(createTransactionsQuery),
+        dbPool.execute(createTransactionsItemsQuery)
         ]
     );
+
+	dbPool.end();
 
     console.log('created users table...'); 
     console.log('created transactions table...');
     console.log('created transactionsItems table...'); 
 
 
-
-	const testUserPromises = testUsers.map( async (u) => await sqlUserDataService.create(u.firstName, u.lastName, u.email, u.password ));
 	
+	const testUserPromises = testUsers.map((u) => { 
+		return sqlUserDataService.create(u.firstName, u.lastName, u.email, u.password )
+	});
+
 	await Promise.all(testUserPromises);
 
-
+	sqlUserDataService.close && sqlUserDataService.close(); 
+	
 	console.log('created test users...');
-
+	
+	
 	const testTransactions = [
 		{
 			initiatorUserId: 1, 
@@ -167,8 +181,8 @@ async function populateDB(dbPool: mysql.Pool) {
 	];
 
 
-	const testTransactionPromises = testTransactions.map( async (t) =>{
-		return await sqlTransactionDataService.create(
+	const testTransactionPromises = testTransactions.map( (t) =>{
+		return sqlTransactionDataService.create(
 			{
 				initiatorUserId: t.initiatorUserId,
 				businessName: t.businessName,
@@ -178,25 +192,21 @@ async function populateDB(dbPool: mysql.Pool) {
 	});
 
 	await Promise.all(testTransactionPromises);
+	sqlTransactionDataService.close && sqlTransactionDataService.close();
 	
-
 	console.log('created test transactions...'); 
 
-    await dbPool.end();
-
-	exit();
-
+	
 }
 
 
-async function dropTables(tablesToDrop: string[], dbPool: mysql.Pool) {
+async function dropTables(dbPool: mysql.Pool) {
 
-    let dropPromises = tablesToDrop.map((tableName) => dbPool.execute(`DROP TABLE ${tableName};`));
+    let dropPromises = tablesToDrop.map((tableName) => dbPool.execute(`DROP TABLE IF EXISTS ${tableName};`));
 
     await Promise.all(dropPromises);
 
-    console.log(`dropped tables: ${tablesToDrop}`); 
-
+    console.log(`if they exist on this database, dropped tables: [ ${tablesToDrop} ]  `); 
 
     await dbPool.end();
     

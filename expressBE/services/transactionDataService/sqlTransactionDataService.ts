@@ -17,7 +17,7 @@ require('dotenv').config();
 
 class SqlTransactionDataService implements TransactionDataService{
 
-     dbPool: mysql.Pool;
+     private dbPool: mysql.Pool;
 
     constructor(params: {host: string, user: string, password: string, database: string, connectionLimit: number}){
         this.dbPool = mysql.createPool({
@@ -27,6 +27,10 @@ class SqlTransactionDataService implements TransactionDataService{
             database: params.database, 
             connectionLimit: params.connectionLimit
         }); 
+    }
+
+    async close() {
+        this.dbPool.end();
     }
 
     /**
@@ -46,9 +50,10 @@ class SqlTransactionDataService implements TransactionDataService{
             //initiatorUserId must exist or GUEST_USER_ID or throw error 
             if (initiatorUserId != -1){
 
-                const userDataService: UserDataService = getUserDataService();
+                const userDataService: UserDataService = await getUserDataService();
                 //this will throw error if initiatorUser is not found
-                userDataService.getByUserId(initiatorUserId);
+                await userDataService.getByUserId(initiatorUserId);
+                userDataService.close && userDataService.close();
 
             }
 
