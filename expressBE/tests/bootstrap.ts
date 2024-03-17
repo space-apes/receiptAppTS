@@ -8,7 +8,7 @@ const bootStrap = async () => {
         let dbPool = await getDBPool();
         await dropTables(dbPool);
         dbPool = await getDBPool();
-        await populateDB(dbPool); 
+        await populateDB(dbPool);
 };
 
 export default bootStrap;

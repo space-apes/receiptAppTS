@@ -109,7 +109,8 @@ const loginGetToken = async (req:Request,res:Response, next: NextFunction) => {
  *               email:
  *                 type: string 
  *               password:
- *                 type: string  
+ *                 type: string
+ *             additionalProperties: false  
  *     responses:
  *       '201':
  *         description: successful creation of User
@@ -237,7 +238,9 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
 
     try {
 
+      const userDataService : UserDataService = await getUserDataService(); 
       const user: User = await userDataService.getByUserId(userId);
+      userDataService.close && userDataService.close();
      
       return res.status(200).json(user);
 
@@ -260,11 +263,12 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
 
   }
 
+
 /**
  * @openapi
  * /api/users/{userId}:
  *   put:
- *     summary: retrieves User by userId
+ *     summary: updates User by userId
  *     parameters:
  *       - in: path
  *         name: userId
@@ -279,14 +283,14 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
  *           schema:
  *             type: object
  *             minProperties: 1
- *             properties:
- *               firstName: 
- *                 type: string
- *               lastName:
- *                 type: string
- *               email:
- *                 type: string
- *                 format: email
+ *             anyOf:
+ *               - $ref: '#/components/schemas/OnlyFirstName'
+ *               - $ref: '#/components/schemas/OnlyLastName'
+ *               - $ref: '#/components/schemas/OnlyEmail'
+ *               - $ref: '#/components/schemas/FirstNameLastName'
+ *               - $ref: '#/components/schemas/FirstNameEmail'
+ *               - $ref: '#/components/schemas/LastNameEmail'
+ *               - $ref: '#/components/schemas/FirstNameLastNameEmail'
  *     responses: 
  *       '200':
  *         description: successfully updated User resource
@@ -329,7 +333,66 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
  *                 - path
  *               properties:
  *                 path: 
- *                   type: string 
+ *                   type: string
+ * components:
+ *   schemas:
+ *     OnlyFirstName:
+ *       type: object
+ *       properties:
+ *         firstName:
+ *           type: string
+ *       additionalProperties: false
+ *     OnlyLastName:
+ *       type: object
+ *       properties:
+ *         lastName:
+ *           type: string
+ *       additionalProperties: false
+ *     OnlyEmail:
+ *       type: object
+ *       properties:
+ *         lastName:
+ *           type: string
+ *           format: email
+ *       additionalProperties: false
+ *     FirstNameLastName:
+ *       type: object
+ *       properties:
+ *         firstName:
+ *           type: string
+ *         lastName:
+ *           type: string
+ *       additionalProperties: false
+ *     FirstNameEmail:
+ *       type: object
+ *       properties:
+ *         firstName:
+ *           type: string
+ *         email:
+ *           type: string
+ *           format: email
+ *       additionalProperties: false
+ *     LastNameEmail:
+ *       type: object
+ *       properties:
+ *         lastName:
+ *           type: string
+ *         email:
+ *           type: string
+ *           format: email
+ *       additionalProperties: false
+ *     FirstNameLastNameEmail:
+ *       type: object
+ *       properties:
+ *         firstName:
+ *           type: string
+ *         lastName:
+ *           type: string
+ *         email:
+ *           type: string
+ *           format: email
+ *       additionalProperties: false
+ *     
  */
   const updateUser = async (req: Request, res: Response, next: NextFunction) => {
 
@@ -340,7 +403,9 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
 
     try{
 
+      const userDataService : UserDataService = await getUserDataService(); 
       let updatedUser : User = await userDataService.update(userId, firstName, lastName, email);
+      userDataService.close && userDataService.close();
       return res.status(200).json(updatedUser);
 
     }
@@ -385,7 +450,10 @@ const registerUser = async (req:Request,res:Response, next:NextFunction)=>{
     let userId : number = parseInt(req.params.userId);
 
     try {
+      
+      const userDataService : UserDataService = await getUserDataService(); 
       userDataService.delete(userId);
+      userDataService.close && userDataService.close();
 
       return res.status(204);
     }catch(err){

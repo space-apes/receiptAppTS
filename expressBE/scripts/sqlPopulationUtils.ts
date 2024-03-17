@@ -129,7 +129,7 @@ async function populateDB(dbPool: mysql.Pool) {
 			businessName: "business1",
 			receiptItemsArray: [
 				{
-					userId: 1,
+					userId: -1,
 					username: "hardcodedusername1", 
 					itemName: "tacos",
 					itemPrice: 12.99
@@ -208,7 +208,7 @@ async function dropTables(dbPool: mysql.Pool) {
 
     console.log(`if they exist on this database, dropped tables: [ ${tablesToDrop} ]  `); 
 
-    await dbPool.end();
+    dbPool.end();
     
 }
 

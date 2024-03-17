@@ -14,6 +14,7 @@ import {ResultSetHeader, RowDataPacket} from 'mysql2';
 
 require('dotenv').config();
 
+const GUEST_USER_ID = -1; 
 
 class SqlTransactionDataService implements TransactionDataService{
 
@@ -45,16 +46,37 @@ class SqlTransactionDataService implements TransactionDataService{
     async create(params: { initiatorUserId: number, businessName: string, receiptItems: [ReceiptItem, ...ReceiptItem[]] }): Promise<number> {
         const {initiatorUserId, businessName, receiptItems} = params;
 
+        //find non guest userIds from both initiatorUserId and receiptItems.userId
+        //to test to see if they exist
+        const registeredIdsArrayBeforeSet: number[] = receiptItems
+            .filter(item => item.userId != GUEST_USER_ID)
+            .map(item => item.userId);
+
+        if (initiatorUserId != GUEST_USER_ID)
+            registeredIdsArrayBeforeSet.push(initiatorUserId);
+        
+        const registeredIdsSet: Set<number> = new Set(registeredIdsArrayBeforeSet);
+        
+        //remove repeats
+        const registeredIdsArray = Array.from(registeredIdsSet);
+
         try {
 
             //initiatorUserId must exist or GUEST_USER_ID or throw error 
-            if (initiatorUserId != -1){
+            if (registeredIdsArray.length > 0){
+
 
                 const userDataService: UserDataService = await getUserDataService();
-                //this will throw error if initiatorUser is not found
-                await userDataService.getByUserId(initiatorUserId);
+                const allRegisteredIdsExist = userDataService.usersExistById && await userDataService.usersExistById(registeredIdsArray);
                 userDataService.close && userDataService.close();
 
+                if (!allRegisteredIdsExist){
+                    throw new SqlTransactionDataServiceNotFoundError({
+                            query: "user service checking userIds",
+                            db: process.env.DB_DATABASE as string,
+                            dbVars: [registeredIdsArray]
+                    });
+                }
             }
 
             let currentQuery = `
@@ -63,7 +85,6 @@ class SqlTransactionDataService implements TransactionDataService{
             `;
 
             const insertTransactionResult = await this.dbPool.execute(currentQuery, [initiatorUserId, businessName]) as ResultSetHeader[];
-
             const newTransactionId = insertTransactionResult[0].insertId;
 
             // add transactionId to each receiptItem and convert to array of arrays for mysql2 
@@ -157,13 +178,17 @@ class SqlTransactionDataService implements TransactionDataService{
     }
 
     /**
+     * returns an array of transactions which the given userId 
+     * was either the initiatorUser or was one of the userIds in transactionsItems 
      * 
+     * does not fetch any userId -1 (guest)
      * @param number userId 
      * @returns Promise<Transaction[]>: all transactions that the user with userId participated in
      */
 
     async getAllByUserId(userId: number): Promise<Transaction[]>{
 
+        /*
         let query = `
         SELECT * FROM transactions t 
         JOIN transactionsItems ti ON ti.transactionId = t.transactionId
@@ -172,8 +197,20 @@ class SqlTransactionDataService implements TransactionDataService{
             FROM transactionsItems tii	
             WHERE tii.userId = ?);	
         `;
+        */
+       let query = `
+       SELECT * FROM transactions t 
+       JOIN transactionsItems ti ON ti.transactionId = t.transactionId
+       WHERE t.transactionId IN
+        (SELECT DISTINCT(tii.transactionId)
+        FROM transactionsItems tii
+        WHERE tii.userId = ?)
+       UNION
+       SELECT * FROM transactions t2
+       JOIN transactionsItems ti2 ON ti2.transactionId = t2.transactionId
+       WHERE t2.initiatorUserId = ?;`;
 
-        let dbVars = [userId];
+        let dbVars = [userId, userId];
 
 
         try {
@@ -185,7 +222,7 @@ class SqlTransactionDataService implements TransactionDataService{
                 });
             }
 
-            const [transactionRows] = await this.dbPool.execute(query, [userId]) as RowDataPacket[];
+            const [transactionRows] = await this.dbPool.execute(query, dbVars) as RowDataPacket[];
 
             if (transactionRows.length == 0){
                 throw new SqlTransactionDataServiceNotFoundError({

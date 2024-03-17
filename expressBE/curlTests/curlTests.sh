@@ -206,11 +206,10 @@ GET_transactions_success1() {
 GET_transactions-users_success1() {
 
     curl \
-     --include \
      --cookie-jar 'cookies.txt' \
      --request 'GET' \
      --header 'Content-Type: application/json' \
-     "$URL/transactions/user/3"
+     "$URL/transactions/user/3" | jq
 }
 
 

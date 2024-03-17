@@ -5,7 +5,7 @@ import dotenv from 'dotenv';
 import {attachMiddleware} from './middleware';
 
 //services selected based on environment variables 
-//from ./sqlSelector.ts
+//from ./serviceSelector.ts
 
 dotenv.config(); 
 
@@ -52,7 +52,7 @@ const io = new Server(server, {
 // add socket handlers for BE 
 io.on('connection', (socket) => {
 	console.log('a user connected'); 
-	io.emit('receiptArray', receiptArray); 
+	io.emit('receiptArray', receiptArray);
 	
 	socket.on('updateItemUser', (indexNewUsername) =>{
 		const {index, newUsername} = indexNewUsername;

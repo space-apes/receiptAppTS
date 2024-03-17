@@ -1,5 +1,4 @@
 import ReceiptSelectTable from '../components/ReceiptSelectTable/ReceiptSelectTable';
-//import testItems1 from '../testData/testItems1'; 
 import {useContext} from 'react'; 
 import GlobalContext from '../context/GlobalContext';
 
@@ -14,7 +13,6 @@ const ReceiptSelectPage = () => {
 			<h1> welcome to receipt select  </h1> 
 			<ReceiptSelectTable receiptSelectDataItems={receiptArray}/>  
 
-			{ /* <ReceiptSelectTable receiptSelectDataItems={testItems1}/> */}
 		</div> 
 	);
 }

@@ -22,7 +22,12 @@ const customErrorHandlerMiddleware  = (err: HttpError, req:Request, res: Respons
 	if (err instanceof APIError){
 		if (err.logging){
 
-			//replace this with loggingService.put action
+
+            //eventually want to log this information
+            //through logging service but not reveal too much
+            //to the consumer of the API
+            //but for now just console.log it
+
 			console.log(`APIError!
 			path: ${err.path}
 			responseCode: ${err.responseCode}
@@ -36,10 +41,20 @@ const customErrorHandlerMiddleware  = (err: HttpError, req:Request, res: Respons
 			});
 		}
 	}
-	return res.status(err.status || 500).json({
-		message: err.message,
-		error: err.errors,
-	});
+    else{
+			console.log(`GenericError!
+            message: ${err.message}
+            error: ${err.errors}
+            stack: ${err.stack}
+			`);
+
+
+    
+        return res.status(err.status || 500).json({
+            message: err.message,
+            error: err.errors,
+        });
+    }
 };
 
 /* 
