@@ -1,3 +1,8 @@
+/*
+    this only houses the API level errors.
+    each subdirectory of 'services' has custom Errors written 
+    specific to the technology that service is implemented in.
+*/
 type CustomContext = {[key:string]: any} | {};
 
 abstract class APIError extends Error {

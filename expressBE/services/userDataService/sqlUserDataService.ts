@@ -2,26 +2,30 @@ import User from '../../types/user';
 import UserDataService from './userDataService';
 import {
     SqlUserDataServiceNotFoundError, 
-    SqlUserDataServiceAlreadyExistsError, 
+    SqlUserDataServiceAlreadyExistsError,
+    UserDataServiceError, 
 } from './userDataServiceError';
 import mysql from 'mysql2/promise';
 import {ResultSetHeader, RowDataPacket} from 'mysql2';
 import argon2 from 'argon2';
 
-require('dotenv').config();
 
 class SqlUserDataService implements UserDataService{
 
-     dbPool: mysql.Pool;
+     private dbPool: mysql.Pool;
 
-    constructor(){
+    constructor(params: {host: string, user: string, password: string, database: string, connectionLimit: number}){
         this.dbPool = mysql.createPool({
-            host: process.env.DB_URL,
-            user: process.env.DB_USER, 
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_DATABASE, 
-            connectionLimit: 10
+            host: params.host,
+            user: params.user, 
+            password: params.password,
+            database: params.database, 
+            connectionLimit: params.connectionLimit
         }); 
+    }
+
+    async close() {
+        this.dbPool.end()
     }
 
     /**
@@ -63,7 +67,7 @@ class SqlUserDataService implements UserDataService{
             VALUES (?, ?, ?, ?, NOW());
             `; 
             const insertResult = await this.dbPool.execute(insertQuery, [firstName,lastName,email, hash]) as ResultSetHeader[];
-            
+
             return insertResult[0].insertId;
         
         }
@@ -111,6 +115,43 @@ class SqlUserDataService implements UserDataService{
             }
         }catch(err){
             throw err; 
+        }
+    }
+
+    /**
+     * 
+     * @param number[] userIds : set of integers we want to test to see if they correspond with valid existing userIds in users table
+     * @returns boolean: true if all given userIds match existing users, false if not
+     */
+    async usersExistById(userIds: number[]): Promise<Boolean>{
+    
+        
+        //need to insert correct number of question marks for 
+        //prepared statement parameterization with "IN" mysql clause
+        //using this mySQL client and .execute() method
+        let questionMarkString: string = "";
+        for (let i = 0; i < userIds.length; i++){
+            questionMarkString+="?,"
+        }
+
+        //remove last comma 
+        questionMarkString = questionMarkString.substring(0, questionMarkString.length -1);
+
+        try {
+
+        if (userIds.length ==0)
+            throw new Error("sqlUserDataService:: empty userIds");
+
+            const userCountQuery = `
+                SELECT COUNT(*) as userCount from users u 
+                WHERE u.userId IN (${questionMarkString});
+            `;
+            
+            const [rows] = await this.dbPool.execute(userCountQuery, userIds) as RowDataPacket[];
+            
+            return rows[0].userCount == userIds.length;
+        } catch(err){
+            throw err;
         }
     }
 

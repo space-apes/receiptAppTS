@@ -7,6 +7,7 @@ const Navbar = () => {
 	const {globals} = useContext(GlobalContext); 
 
 	const {curUsername, isConnectedToSocketServer} = globals;
+
 	return (
 		<header> 
 			<div className="container"> 

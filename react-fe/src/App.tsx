@@ -27,25 +27,29 @@ function App() {
 
 	useEffect(()=>{
 		function onConnect() {
-			setGlobals({...globals, isConnectedToSocketServer: true});
+			setGlobals((prev) => {return {...prev, isConnectedToSocketServer: true}});
 		}
 
 		function onDisconnect() {
-			setGlobals({...globals, isConnectedToSocketServer: false});
+			setGlobals((prev) => {return {...prev, isConnectedToSocketServer: false}});
 		}
 
 		function onReceiptArray(receiptArrayFromSocket:[]) {
-			console.log(`receipt received`);
-			console.log(globals);
-			setGlobals({...globals, receiptArray: receiptArrayFromSocket})
-			console.log(globals);
+			setGlobals((prev) => {return {...prev, receiptArray: receiptArrayFromSocket}});
 		}	
 
 
 		socket.on('connect', onConnect);
 		socket.on('disconnect', onDisconnect);
 		socket.on('receiptArray', onReceiptArray);
-	}, [globals, setGlobals]);
+
+		return ()=>{
+			socket.off('connect', onConnect);
+			socket.off('disconnect', onDisconnect);
+			socket.off('receiptArray', onReceiptArray);
+
+		};
+	}, []);
 
   return (
     <div className="App">

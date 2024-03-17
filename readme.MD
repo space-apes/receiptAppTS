@@ -24,7 +24,7 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
   - custom error/exception handling flow for each layer
   - can easily be converted to micro-service architecture
 
-- contract driven API development
+- contract-driven API development
   - single source of truth using openAPI 3.0 specification
   - generate as much code by trusted open source libraries as possible over writing my own solutions (EX: API validation)
   - language/framework agnostic and can switch technologies if needed
@@ -71,8 +71,8 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
   - persisted data services: mysql accessed by node through mysql2 library
 
 # Future Improvements
+- the real goal is to use this monolithic app as practice for converting into a cloud based scalable micro-services app: pull User, Transaction, Session, and ReceiptParsing services into their own micro-service instances with Dockerfiles and node images. reverse-proxy for monitoring, load-balancers for each service with horizontal scaling handled. I aim to build everything using terraform IaC. 
 - be completely contract driven instead of partially and generate all controller, validator, model code from contract
-- pull User, Transaction, Session, and ReceiptParsing services into their own micro-service instances with Dockerfiles and node images. reverse-proxy for monitoring, load-balancers for each service with horizontal scaling
 - further separate service layer into generic data retrieval layers and programatic business logic/processing layer. the data retrieval layer could handle retrieving and formatting data in some standardized way and the business logic layer could remain unchanged.
 - integration with third party payment APIs 
 
@@ -89,17 +89,24 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
 	```
 3. create .env files 
   - BE: within BE directory create a file named .env fields and values:
-    - String: NODE_ENV # ex: 'dev', 'local', 'prod'
+    - String: NODE_ENV # ex: 'dev', 'local', 'prod'. use 'dev' for initial population
     - String[]: ALLOWED_HOSTS
+    - EXPRESS_PORT: # whatever port you want express server to run on 
     - String: JWT_SECRET # arbitrary random string
+
+    - String: DB_DATABASE # ex: 'receiptAppDev'
+    - String: DB_URL # ex 'localhost'
+    - String: DB_USER 
+    - String: DB_PASSWORD 
+
     - String: DB_DATABASE # ex: 'receiptAppDev'
     - String: DB_URL # ex 'localhost'
     - String: DB_USER 
     - String: DB_PASSWORD 
 
   - FE: within FE directory create file named .env with fields and values: 
-    - String: BE_URL
-    - ...
+    - String: REACT_APP_BE_URL
+    - String: REACT_APP_SOCKET_URL
 
 4. from BE directory, run BE population script
   - `npm run populateDB`

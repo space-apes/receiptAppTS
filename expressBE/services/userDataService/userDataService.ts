@@ -7,6 +7,8 @@ interface UserDataService{
     getByUserEmail(email: number): Promise<User>;
     update(userId:number, firstName?: string, lastName?: string, email?: string): Promise<User>;
     delete(userId: number): void;
+    usersExistById?(userIds: number[]): Promise<Boolean>
+    close?(): void; 
 }
 
 export default UserDataService;

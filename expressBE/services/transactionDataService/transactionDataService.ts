@@ -8,6 +8,7 @@ interface TransactionDataService{
     getByTransactionId(transactionId: number): Promise<Transaction>;
     getAllByUserId(userId: number): Promise<Transaction[]>;
     delete(userId: number): Promise<void>; //this should only be used during develpment
+    close?(): void;
 }
 
 export default TransactionDataService;

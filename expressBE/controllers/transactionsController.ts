@@ -3,12 +3,10 @@ import Transaction from '../types/transaction';
 import TransactionDataService from '../services/transactionDataService/transactionDataService';
 import {getTransactionDataService} from '../serviceSelector';
 import {
-	TransactionDataServiceAlreadyExistsError,
 	TransactionDataServiceNotFoundError
 }from '../services/transactionDataService/transactionDataServiceError';
 import {
 	APINotFoundError,
-	APIAlreadyExistsError
 } from '../errors/apiError';
 
 /**
@@ -33,6 +31,8 @@ import {
  *                 type: string
  *               receiptItems:
  *                 type: array
+ *                 minItems: 1
+ *                 maxItems: 200
  *                 items: 
  *                   type: object
  *                   required: [userId, username, itemName, itemPrice]
@@ -55,22 +55,11 @@ import {
  *             schema:
  *               type: object 
  *               required: 
- *                 - userId
+ *                 - transactionId
  *               properties:
  *                 userId: 
  *                   type: integer
  *                   format: int64
- *       '409': 
- *         description: resource already exists
- *         content: 
- *           application/json:
- *             schema: 
- *               type: object
- *               required: 
- *                 - path
- *               properties:
- *                 path:
- *                   type: string  
  *       '400': 
  *         description: catch-all invalid input response
  *         content: 
@@ -82,6 +71,17 @@ import {
  *               properties:
  *                 path:
  *                   type: string  
+ *       '404':
+ *         description: supplied userId for this transaction does not exist
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               required:
+ *                 - path
+ *               properties:
+ *                 path: 
+ *                   type: string 
  *  
  */
 const createTransaction = async (req: Request, res: Response, next: NextFunction) => {
@@ -90,11 +90,21 @@ const createTransaction = async (req: Request, res: Response, next: NextFunction
 	try{
 
 		const transactionDataService : TransactionDataService = await getTransactionDataService(); 
+		//
 		const newTransactionId = await transactionDataService.create(req.body);
+		transactionDataService.close && transactionDataService.close();
 
-		return res.status(201).json({tranactionId: newTransactionId});
+		return res.status(201).json({transactionId: newTransactionId});
 
 	}catch(err){
+		if (err instanceof TransactionDataServiceNotFoundError){
+			  const apiErrorParams = {
+				path: req.originalUrl,
+				logging: true,
+				context: err.context
+			};
+			next(new APINotFoundError(apiErrorParams));
+		}
 		next(err);
 	}
 
@@ -176,6 +186,7 @@ const getTransactionByTransactionId = async (req:Request, res: Response, next: N
 	try{
 		const transactionDataService = await getTransactionDataService();
 		const transaction: Transaction = await transactionDataService.getByTransactionId(transactionId);
+		transactionDataService.close && transactionDataService.close();
 
 		return res.status(200).json(transaction);
 	}catch(err){
@@ -186,7 +197,7 @@ const getTransactionByTransactionId = async (req:Request, res: Response, next: N
 				logging: true,
 				context: err.context
 			};
-			throw new APINotFoundError(apiErrorParams);
+			next(new APINotFoundError(apiErrorParams));
 		}
 		else{
 			next(err);
@@ -271,6 +282,7 @@ const getTransactionsByUserId = async (req:Request, res: Response, next: NextFun
 
 		const transactionDataService = await getTransactionDataService();
 		const transactions: Transaction[] = await transactionDataService.getAllByUserId(userId);
+		transactionDataService.close && transactionDataService.close();
 
 
 		return res.status(200).json(transactions);
@@ -282,7 +294,7 @@ const getTransactionsByUserId = async (req:Request, res: Response, next: NextFun
 				logging: true,
 				context: err.context
 			};
-			throw new APINotFoundError(apiErrorParams);
+			next(new APINotFoundError(apiErrorParams));
 		}
 		else{
 			next(err);
