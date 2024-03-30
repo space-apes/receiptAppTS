@@ -49,7 +49,7 @@ class SqlUserDataService implements UserDataService{
             let dbVars = [email];
 
             const [selectRows] = await this.dbPool.execute(selectQuery, dbVars) as RowDataPacket[];
-            
+           
             if (selectRows.length > 0){
                 throw new SqlUserDataServiceAlreadyExistsError({
                         query: selectQuery,
@@ -73,6 +73,7 @@ class SqlUserDataService implements UserDataService{
         }
         catch(err)
         {
+            this.close();
             throw err; 
         }
     }
@@ -114,6 +115,7 @@ class SqlUserDataService implements UserDataService{
                 return user; 
             }
         }catch(err){
+            this.close();
             throw err; 
         }
     }
@@ -151,13 +153,14 @@ class SqlUserDataService implements UserDataService{
             
             return rows[0].userCount == userIds.length;
         } catch(err){
+            this.close();
             throw err;
         }
     }
 
 
     /**
-     * retrieve user data from userId 
+     * retrieve user data from email address
      * 
      * @param email : string
      * @returns Promise<User>
@@ -192,6 +195,7 @@ class SqlUserDataService implements UserDataService{
                 return user; 
             }
         }catch(err){
+            this.close();
             throw err; 
         }
     }
@@ -250,6 +254,7 @@ class SqlUserDataService implements UserDataService{
 
             return user;  
         }catch(err){
+            this.close();
             throw err;
         }
 
@@ -282,6 +287,7 @@ class SqlUserDataService implements UserDataService{
 
             return; 
         }catch(err){
+            this.close();
             throw err; 
         }
     }
