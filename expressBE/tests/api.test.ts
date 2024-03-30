@@ -146,9 +146,11 @@ describe("Users controller", ()=>{
             it("should respond with 404 http status code", async () =>{
 
                 const res = await supertest(app)
-                    .get("/api/users/50")
-                    .set("content-type", "application/json");
+                .get("/api/users/50")
+                .set("content-type", "application/json");
+
                 expect(res.status).toBe(404);
+
             });
         });
 
@@ -298,6 +300,7 @@ describe("Users controller", ()=>{
     //to preserve transaction integrity 
 
 });
+
 
 describe("transactions controller", ()=> {
 

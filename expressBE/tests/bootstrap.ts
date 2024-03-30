@@ -9,6 +9,7 @@ const bootStrap = async () => {
         await dropTables(dbPool);
         dbPool = await getDBPool();
         await populateDB(dbPool);
+
 };
 
 export default bootStrap;

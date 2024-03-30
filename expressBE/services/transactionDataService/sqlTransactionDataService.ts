@@ -105,6 +105,7 @@ class SqlTransactionDataService implements TransactionDataService{
 
         }
         catch (err) {
+            this.close();
             throw err; 
         }
     }
@@ -173,6 +174,7 @@ class SqlTransactionDataService implements TransactionDataService{
             }
 
         }catch(err){
+            this.close();
             throw err; 
         }
     }
@@ -274,6 +276,7 @@ class SqlTransactionDataService implements TransactionDataService{
             return transactions; 
             
         }catch(err){
+            this.close();
             throw err; 
         }
     }
@@ -318,6 +321,7 @@ class SqlTransactionDataService implements TransactionDataService{
             }
         return; 
         }catch(err){
+            this.close();
             throw err; 
         }
     }
