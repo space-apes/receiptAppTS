@@ -10,10 +10,13 @@ import {
     getTransactionByTransactionId,
     getTransactionsByUserId
 } from './controllers/transactionsController';
+import {
+    createGuestSession
+} from './controllers/sessionsController';
 
 /*** SESSION ROUTES ***/
-//this should definitely be a service in case diff technologies are used
-//get new token
+const sessionsRouter = Router();
+sessionsRouter.post('/createGuestSession', createGuestSession)
 //sessionRouter.post('/login', loginGetToken);
 //verify token 
 //no refresh token endpoint. just get a new token. 
@@ -41,5 +44,6 @@ transactionsRouter.get('/user/:userId', getTransactionsByUserId);
 
 export {
     usersRouter, 
-    transactionsRouter
+    transactionsRouter,
+    sessionsRouter
 };

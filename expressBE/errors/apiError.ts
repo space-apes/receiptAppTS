@@ -52,8 +52,38 @@ class APIAlreadyExistsError extends APIError {
     }
 }
 
+class APIBadRequestError extends APIError {
+    constructor(params: {path: string, logging?: boolean, context?: CustomContext}, message?: string){
+        super({
+                responseCode: 400,
+                path: params.path,
+                context: params.context || {},
+                logging: params.logging || true
+            },
+            message || "APIBadRequestError"
+        );
+        Object.setPrototypeOf(this, APIAlreadyExistsError.prototype);
+    }
+}
+
+class APIForbiddenError extends APIError {
+    constructor(params: {path: string, logging?: boolean, context?: CustomContext}, message?: string){
+        super({
+                responseCode: 403,
+                path: params.path,
+                context: params.context || {},
+                logging: params.logging || true
+            },
+            message || "APIForbiddenError"
+        );
+        Object.setPrototypeOf(this, APIAlreadyExistsError.prototype);
+    }
+}
+
 export {
     APIError,
     APINotFoundError,
-    APIAlreadyExistsError
+    APIAlreadyExistsError,
+    APIBadRequestError,
+    APIForbiddenError
 };

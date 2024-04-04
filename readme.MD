@@ -9,7 +9,7 @@
 This is my dream BE project with the goals of minimizing software maintenance costs, developer headaches, and experimenting with
 new technologies, architectures, and project management tools. It is currently _STILL IN DEVELOPMENT_. 
 
-ReceiptApp is a service for groups of people who need a quick and easy way to split costs at places like restaurants or bars. Simply scan a receipt which will be parsed by an OCR, send a unique URL link to your friends, then collectively select who will pay for which items will in real time. Once the purchase has been submitted, registered users have the ability to review previous receipts. In the future, payments will also be handled automatically by 3rd party payment APIs (stripe, venmo, etc). 
+ReceiptApp is a service for groups of people who need a quick and easy way to split the bill at places like restaurants or bars. Simply scan a receipt which will be parsed by an OCR, send a unique URL link to your friends, then collectively select who will pay for which items will in real time. Once the purchase has been submitted, registered users have the ability to review previous receipts. In the future, payments will also be handled automatically by 3rd party payment APIs (stripe, venmo, etc). 
 
 # Features
 - single-language stack 
@@ -80,30 +80,35 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
 # How To Run
 1. clone entire repo
 2. install dependencies by running 'npm install' in both FE and BE directories
-3. install mySQL server locally, or have a mySQL server available. note credentials, URL, db   
+3. install mySQL server locally, or have a mySQL server available. note credentials, URL, db. ensure mySQL server is running   
 4. Create dev database on mysql server
 	- log-in to mysql server via mysql client (EX: DBeaver)
 	- MySQL Script:
 	```
 	CREATE DATABASE receiptAppDev;
+  CREATE DATABASE receiptAppTest; 
 	```
 3. create .env files 
   - BE: within BE directory create a file named .env fields and values:
-    - String: NODE_ENV # ex: 'dev', 'local', 'prod'. use 'dev' for initial population
-    - String[]: ALLOWED_HOSTS
-    - EXPRESS_PORT: # whatever port you want express server to run on 
-    - String: JWT_SECRET # arbitrary random string
+    - String: NODE_ENV # example 'NODE_ENV=dev'. can select from 'dev, test, prod'
+    - String[] ALLOWED_HOSTS
+    - Number EXPRESS_PORT: # whatever port you want express server to run on 
+    - String JWT_SECRET # arbitrary random string
+    - String JWT_DURATION # ex "20m" or "1h" 
 
-    - String: DB_DATABASE # ex: 'receiptAppDev'
-    - String: DB_URL # ex 'localhost'
-    - String: DB_USER 
-    - String: DB_PASSWORD 
-
-    - String: DB_DATABASE # ex: 'receiptAppDev'
-    - String: DB_URL # ex 'localhost'
-    - String: DB_USER 
-    - String: DB_PASSWORD 
-
+    - String DB_DATABASE 
+    - String DB_URL 
+    - String DB_USER 
+    - String DB_PASSWORD
+    - Number DEV_DB_CONNECTIONLIMIT
+    
+    - String TEST_DB_URL
+    - String TEST_DB_USER
+    - String TEST_DB_PASSWORD
+    - String TEST_DB_DATABASE
+    - Number TEST_DB_CONNECTIONLIMIT
+  
+  
   - FE: within FE directory create file named .env with fields and values: 
     - String: REACT_APP_BE_URL
     - String: REACT_APP_SOCKET_URL
@@ -112,9 +117,10 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
   - `npm run populateDB`
   - (you can also run `npm run clearDB` to reset DB to starting state)
 
-5. start up BE server from BE directory
+5. navigate to BE directory 'expressBE' and start up local BE server
   - `npm start` 
-6. start up FE server from FE directory
+6. navigate to FE directory and start up local FE server
   - `npm start` 
+  - web browser will automatically open a tab to FE
 7. should see the socket.io console.log messages for 'user connected' and updateItemUser
 8. navigate browser to FE address or `{BE address}/api-docs` to see openAPI documentation

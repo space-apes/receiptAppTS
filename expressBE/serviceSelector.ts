@@ -20,8 +20,8 @@ import UserDataService from './services/userDataService/userDataService';
 import SqlUserDataService from './services/userDataService/sqlUserDataService';
 import TransactionDataService from './services/transactionDataService/transactionDataService';
 import SqlTransactionDataService from './services/transactionDataService/sqlTransactionDataService';
-import dotenv from 'dotenv';
-dotenv.config();
+import SessionService from './services/sessionService/sessionService';
+import CustomJWTSessionService from './services/sessionService/customJWTSessionService';
 
 const getUserDataService = async ():Promise<UserDataService> => {
 
@@ -100,4 +100,21 @@ const getTransactionDataService = async ():Promise<TransactionDataService> => {
     return transactionDataService;
 }
 
-export {getUserDataService, getTransactionDataService}; 
+const getSessionService = async (): Promise<SessionService> =>{
+    let sessionService: SessionService; 
+
+    switch (process.env.NODE_ENV){
+        case 'test': 
+            sessionService = new CustomJWTSessionService();   
+            break;
+        case 'dev':
+            sessionService = new CustomJWTSessionService();   
+            break;
+        default:
+            sessionService = new CustomJWTSessionService();   
+            break;
+    }
+    return sessionService;
+}
+
+export {getUserDataService, getTransactionDataService, getSessionService}; 
