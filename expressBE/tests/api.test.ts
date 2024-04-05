@@ -1,5 +1,7 @@
 import supertest from 'supertest';
 import app from './app';
+import { jwtDecode, JwtPayload } from 'jwt-decode';
+import JWTClaims from '../services/sessionService/jwtClaims';
 
 let testUserData = {
     valid: {
@@ -451,6 +453,56 @@ describe("transactions controller", ()=> {
 
              });
              
+        });
+    });
+});
+
+
+describe("Sessions controller", ()=>{
+
+    describe("POST sessions/createGuestSession", () =>{
+
+        describe("if given valid roomName and displayedName", () =>{
+            it("should respond with 200 and set cookie with userId -1", async () =>{
+
+                const res = await supertest.agent(app)
+                .post("/api/sessions/createGuestSession")
+                .set("content-type", "application/json")
+                .send({
+                    'displayedName': 'testJWTSuccessName',
+                    'roomName': 'testJWTSuccessRoomName'
+                });
+
+                const setCookies = res.headers['set-cookie'];
+
+                //set only one cookie
+                expect (setCookies.length).toBe(1);
+                const cookieString = setCookies[0];
+
+                //cookie includes name of jwt
+                expect(cookieString.includes('receiptAppJWT'));
+
+                //parse out just the jwt from the cookie string
+                const jwt = cookieString.match(/receiptAppJWT=([^;]+);/)?.[1];
+                
+                expect(res.status).toBe(200);
+
+
+                const claims = jwtDecode<JwtPayload & JWTClaims>(jwt || '');
+
+                console.log(claims);
+                
+                //have correct fields
+                expect(claims).toHaveProperty('userId');
+                expect(claims).toHaveProperty('displayedName');
+                expect(claims).toHaveProperty('roomName');
+                expect(claims).toHaveProperty('exp');
+
+                //have guest userId
+                expect(claims.userId).toBe(-1);
+
+
+            });
         });
     });
 });
