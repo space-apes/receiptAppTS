@@ -226,6 +226,38 @@ POST_session_guest1() {
      "$URL/sessions/createGuestSession"
 }
 
+POST_session_failure_roomNameContainsHyphen_guest1() {
+    payload='{
+        "displayedName": "tiny tim",
+        "roomName": "tims cool-room" 
+    }'
+
+    curl \
+     --cookie-jar 'cookies.txt' \
+     --include \
+     --request 'POST' \
+     --header 'Content-Type: application/json' \
+     --data "$payload" \
+     "$URL/sessions/createGuestSession"
+}
+
+POST_session_failure_nonexistent_email_registered1() {
+    payload='{
+        "displayedName": "tiny tim",
+        "roomName": "tims coolroom",
+        "email": "nosuchemail@test.com",
+        "password": "coolpasswordbro:"
+    }'
+
+    curl \
+     --cookie-jar 'cookies.txt' \
+     --include \
+     --request 'POST' \
+     --header 'Content-Type: application/json' \
+     --data "$payload" \
+     "$URL/sessions/createRegisteredSession"
+}
+
 
 ########## EXECUTION ##########
 

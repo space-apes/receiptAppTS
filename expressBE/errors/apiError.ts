@@ -62,7 +62,7 @@ class APIBadRequestError extends APIError {
             },
             message || "APIBadRequestError"
         );
-        Object.setPrototypeOf(this, APIAlreadyExistsError.prototype);
+        Object.setPrototypeOf(this, APIBadRequestError.prototype);
     }
 }
 
@@ -76,7 +76,21 @@ class APIForbiddenError extends APIError {
             },
             message || "APIForbiddenError"
         );
-        Object.setPrototypeOf(this, APIAlreadyExistsError.prototype);
+        Object.setPrototypeOf(this, APIForbiddenError.prototype);
+    }
+}
+
+class APIUnauthorizedError extends APIError {
+    constructor(params: {path: string, logging?: boolean, context?: CustomContext}, message?: string){
+        super({
+                responseCode: 401,
+                path: params.path,
+                context: params.context || {},
+                logging: params.logging || true
+            },
+            message || "APIUnauthorizedError"
+        );
+        Object.setPrototypeOf(this, APIUnauthorizedError.prototype);
     }
 }
 
@@ -85,5 +99,6 @@ export {
     APINotFoundError,
     APIAlreadyExistsError,
     APIBadRequestError,
-    APIForbiddenError
+    APIForbiddenError,
+    APIUnauthorizedError
 };

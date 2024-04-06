@@ -291,8 +291,46 @@ class SqlUserDataService implements UserDataService{
             throw err; 
         }
     }
-
     
+    /**
+     * areValidCredentials
+     * 
+     * this function takes in identifier and password and
+     * verifies that a user exists with the identifier and 
+     * that the password is valid. 
+     * 
+     * @param params
+     *   - string: userIdentifier in this case, email address
+     *   - string: password 
+     * @returns Promise<boolean> true if credentials are valid, false if not 
+     */
+
+    async areValidCredentials(params: {userIdentifier: string, password: string}): Promise<boolean> {
+        
+        const {userIdentifier, password} = params; 
+
+        try {
+            const userQuery:string = `
+            SELECT * from users u 
+            WHERE email = ? 
+            `;
+
+            let dbVars = [userIdentifier];
+
+            const [rows, fields] = await this.dbPool.execute(userQuery, dbVars) as RowDataPacket[];
+           
+            if (rows.length == 0 || ! await argon2.verify(rows[0]['password'], password)) {
+                return false;
+            }
+
+            return true;
+
+        }catch(err){
+            this.close(); 
+            throw err; 
+        }
+    
+    } 
 
 
 }

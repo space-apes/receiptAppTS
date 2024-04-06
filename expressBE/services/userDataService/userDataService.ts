@@ -8,6 +8,7 @@ interface UserDataService{
     update(userId:number, firstName?: string, lastName?: string, email?: string): Promise<User>;
     delete(userId: number): void;
     usersExistById?(userIds: number[]): Promise<Boolean>
+    areValidCredentials(params: {userIdentifier: string, password: string}): Promise<boolean> 
     close?(): void; 
 }
 

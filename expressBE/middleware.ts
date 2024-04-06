@@ -38,7 +38,8 @@ const customErrorHandlerMiddleware  = (err: HttpError, req:Request, res: Respons
 			`);
 
 			return res.status(err.responseCode || 500).json({
-				path: err.path
+				path: err.path,
+                msg: err.message
 			});
 		}
 	}
@@ -78,8 +79,6 @@ function attachMiddleware(app: Express) : Express {
     })
 
 
-
-
     //main app middleware
     app.use([
         cors({origin: "*"}),
@@ -88,7 +87,6 @@ function attachMiddleware(app: Express) : Express {
         express.text(),
         express.urlencoded({extended: false})
     ]);
-
 
     //validator middleware
 

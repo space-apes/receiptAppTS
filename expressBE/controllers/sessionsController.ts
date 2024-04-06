@@ -7,9 +7,13 @@ import {sign, verify} from 'jsonwebtoken';
 import { 
     APIBadRequestError,
     APIForbiddenError,
-    APINotFoundError
+    APINotFoundError,
+    APIUnauthorizedError
  } from '../errors/apiError';
 import argon2 from 'argon2'; 
+import { getUser } from './usersController';
+import { UserDataServiceError } from '../services/userDataService/userDataServiceError';
+import { userInfo } from 'os';
 
 //TODO: OPENAPI SCHTUFF
 
@@ -114,7 +118,7 @@ const createNewRegisteredSession = async (req: Request, res: Response, next: Nex
  * @openapi
  * /api/sessions/createGuestSession:
  *   post:
- *     summary: creates new JWT session token for guest as initiator user
+ *     summary: creates new JWT session token for guest initiator user
  *     requestBody:
  *       required: true 
  *       content:
@@ -131,7 +135,14 @@ const createNewRegisteredSession = async (req: Request, res: Response, next: Nex
  *                 type: string
  *     responses:
  *       '200':
- *         description: successful creation of User
+ *         description: >
+ *           successfully created session token for guest user
+ *           token 'receiptAppJWT' will be set.
+ *         headers:
+ *           Set-Cookie:
+ *             schema:
+ *               type: string
+ *               example: receiptAppJWT=21312412414; httpOnly
  *         content:
  *           application/json: 
  *             schema:
@@ -162,16 +173,20 @@ const createGuestSession = async (req: Request, res: Response, next: NextFunctio
 
     //note: use dedicated auth/identity services for next iteration
 
-    const displayedName = req.body.displayedName || '';
-    const roomName = req.body.roomName || '';
+    const {displayedName, roomName} = req.body;
 
-    if (roomName.includes("-")){
-        return res.status(400).json({
-            msg:"roomName can not include '-' character" 
-        })
-    }
 
     try {
+
+        if (roomName.includes("-")){
+            throw new APIBadRequestError({
+                path: req.originalUrl,
+                logging: true,
+                context: {
+                    roomName: roomName
+                }
+            }, "roomName can not contain '-' characters");
+        }
 
         const sessionService: SessionService = await getSessionService();
 
@@ -199,7 +214,157 @@ const createGuestSession = async (req: Request, res: Response, next: NextFunctio
         next(err);
     }
 }
-    
 
-export {createGuestSession};
+/**
+ * @openapi
+ * /api/sessions/createRegisteredSession:
+ *   post:
+ *     summary: creates new JWT session token for registered initiator user
+ *     requestBody:
+ *       required: true 
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - displayedName
+ *               - roomName
+ *               - email
+ *               - password
+ *             properties:
+ *               displayedName: 
+ *                 type: string
+ *               roomName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: >
+ *           successfully created session token for registered user
+ *           token 'receiptAppJWT' will be set.
+ *         headers:
+ *           Set-Cookie:
+ *             schema:
+ *               type: string
+ *               example: receiptAppJWT=21312412414; httpOnly
+ *         content:
+ *           application/json: 
+ *             schema:
+ *               type: object 
+ *               required: 
+ *                 - msg
+ *               properties:
+ *                 msg: 
+ *                   type: string
+ *       '401': 
+ *         description: invalid credentials
+ *         content: 
+ *           application/json:
+ *             schema: 
+ *               type: object
+ *               required: 
+ *                 - path
+ *                 - msg
+ *               properties:
+ *                 path:
+ *                   type: string
+ *                 msg:
+ *                   type: string  
+ *       '400': 
+ *         description: catch-all invalid input response
+ *         content: 
+ *           application/json:
+ *             schema: 
+ *               type: object
+ *               required: 
+ *                 - path
+ *                 - msg
+ *               properties:
+ *                 path:
+ *                   type: string
+ *                 msg:
+ *                   type: string  
+ *  
+ */
+
+const createRegisteredSession = async (req: Request, res: Response, next: NextFunction) => {
+
+    //note: use dedicated auth/identity services for next iteration
+
+    const {displayedName, roomName, email, password} = req.body; 
+
+    try {
+        
+        if (roomName.includes("-")){
+            throw new APIBadRequestError({
+                path: req.originalUrl,
+                logging: true,
+                context: {
+                    roomName: roomName
+                }
+            }, "roomName can not contain '-' characters");
+        }
+
+        //if no user exists with those credentials, respond 401
+        //i don't like having the UserDataService be contacted to verify 
+        // email and password. in future will use service rolling identity and tokens in 1 
+        const userDataService: UserDataService = await getUserDataService();
+
+        const validCredentials: boolean = await userDataService.areValidCredentials({
+            userIdentifier:email,
+            password:password
+        });
+
+        if (!validCredentials){
+
+            userDataService.close && userDataService.close();
+            throw new APIUnauthorizedError({
+                path: req.originalUrl,
+                logging: true,
+                context: {
+                    email: email,
+                    password: password 
+                }
+            });
+        }
+
+        //valid credentials so now retrieve userId 
+        //again, this will not be 2 separate queries in next iterateion.
+
+        const userId: number = (await userDataService.getByUserEmail(email)).userId;
+        userDataService.close && userDataService.close()
+
+        const sessionService: SessionService = await getSessionService();
+
+        const sessionToken: string = sessionService.create({
+            userId: userId,
+            displayedName: displayedName,
+            roomName: sessionService.addRandomStringToRoomName(roomName)
+        });
+
+        const jwtDurationInSeconds = sessionService.convertJWTDurationToSeconds(process.env.JWT_DURATION as string);
+
+        //create httpOnly cookie to store jwt 
+        res.cookie("receiptAppJWT", sessionToken, {
+        maxAge: jwtDurationInSeconds,
+        httpOnly:true,
+        //secure:true
+        });
+
+        //give success response
+        return res.status(200).json({
+            msg: "successfully created access token", 
+        });
+        
+    }catch(err){
+        next(err);
+    }
+}
+
+
+export {createGuestSession, createRegisteredSession};
 

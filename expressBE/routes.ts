@@ -11,12 +11,14 @@ import {
     getTransactionsByUserId
 } from './controllers/transactionsController';
 import {
-    createGuestSession
+    createGuestSession,
+    createRegisteredSession
 } from './controllers/sessionsController';
 
 /*** SESSION ROUTES ***/
 const sessionsRouter = Router();
 sessionsRouter.post('/createGuestSession', createGuestSession)
+sessionsRouter.post('/createRegisteredSession', createRegisteredSession)
 //sessionRouter.post('/login', loginGetToken);
 //verify token 
 //no refresh token endpoint. just get a new token. 
