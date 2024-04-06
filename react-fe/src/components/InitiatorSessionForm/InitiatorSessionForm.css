@@ -1,0 +1,19 @@
+.errorText{
+    color:red;
+}
+
+/* highest level form container */
+.formContainer{
+    display: flex;
+    flex-direction: row;
+}
+
+/*registered vs guest */
+.formSection{
+
+}
+
+/* individual label/input tag items*/
+.formItem{
+
+}

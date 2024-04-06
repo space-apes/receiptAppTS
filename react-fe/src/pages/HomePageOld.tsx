@@ -1,7 +1,6 @@
 import {useNavigate} from 'react-router-dom';
 import React, {useContext} from 'react';
 import GlobalContext from '../context/GlobalContext';
-import InitiatorSessionForm from '../components/InitiatorSessionForm/InitiatorSessionForm';
 
 const HomePage = () => {
 
@@ -29,12 +28,17 @@ const HomePage = () => {
 	return (
 		<div className="homePageDiv"> 
 			<h1> Home Screen </h1> 
+
 			<div className="centered">
-				<h4>
-					Please enter roomName and displayedName to create new guest transaction.
-					Registered users can also enter email/password to remember this transaction.
-				</h4>
-				<InitiatorSessionForm/>
+				<form onSubmit={handleSubmit}> 
+
+					<p> please enter your username </p>
+					<label>
+						<input type="text" name="usernameInput"/> 
+					</label>
+
+					<button> submit </button>
+				</form>
 			</div>
 		</div> 
 	);
