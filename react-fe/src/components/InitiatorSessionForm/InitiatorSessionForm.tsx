@@ -4,7 +4,8 @@ import "./InitiatorSessionForm.css";
 
 function InitiatorSessionForm() {
   const [formData, setFormData] = useState({
-    username: '',
+    roomName: '',
+    displayedName: '',
     email: '',
     password: '',
   });
@@ -22,20 +23,31 @@ function InitiatorSessionForm() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Validate form data
     let validationErrors: {[key:string]: string} = {};
 
-    if (!formData.username.trim()) {
-      validationErrors.username = 'Username is required';
+    if (!formData.roomName.trim()) {
+      validationErrors.roomName = 'roomName is required';
     }
-    if (!formData.email.trim()) {
-      validationErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+
+    if (!formData.displayedName.trim()) {
+      validationErrors.displayedName = 'displayedName is required';
+    }
+
+    //need both email and password 
+    if ((!formData.email.trim() && formData.password.trim()) ||
+      (formData.email.trim() && !formData.password.trim())
+    ) {
+      validationErrors.email = 'if submitting email or password need both';
+      validationErrors.password = 'if submitting email or password need both';
+    }
+
+
+
+    
+    if (formData.email.trim() && !/\S+@\S+\.\S+/.test(formData.email.trim())) {
       validationErrors.email = 'Email is invalid';
     }
-    if (!formData.password.trim()) {
-      validationErrors.password = 'Password is required';
-    }
+    
 
     // If there are validation errors, set them and stop form submission
     if (Object.keys(validationErrors).length > 0) {
@@ -49,47 +61,70 @@ function InitiatorSessionForm() {
 
   return (
     <form onSubmit={handleSubmit}>
-      {/* Username field */}
-      <div>
-        <label htmlFor="username">Username</label>
-        <input
-          type="text"
-          id="username"
-          name="username"
-          value={formData.username}
-          onChange={handleChange}
-        />
-        {errors.username && <span>{errors.username}</span>}
-      </div>
+      <div className="formContainer">
 
-      {/* Email field */}
-      <div>
-        <label htmlFor="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-        />
-        {errors.email && <span>{errors.email}</span>}
-      </div>
+        {/*required fields */}
+        <div className='formSection'>
+          <div>
+            <label htmlFor="roomName">Room Name</label>
+            <br/>
+            <input
+              type="text"
+              id="roomName"
+              name="roomName"
+              value={formData.roomName}
+              onChange={handleChange}
+            />
+            {errors.roomName && <span className="errorText">{errors.roomName}</span>}
+          </div>
 
-      {/* Password field */}
-      <div>
-        <label htmlFor="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-        />
-        {errors.password && <span>{errors.password}</span>}
-      </div>
+          <div>
+            <label htmlFor="displayedName">Your Displayed Name</label>
+            <br/>
+            <input
+              type="text"
+              id="displayedName"
+              name="displayedName"
+              value={formData.displayedName}
+              onChange={handleChange}
+            />
+            {errors.displayedName && <span className="errorText">{errors.displayedName}</span>}
+          </div>
+        </div>
 
-      {/* Submit button */}
-      <button type="submit">Submit</button>
+        {/*optional fields to login */}
+        <div className='formSection'>
+          <div>
+            <label htmlFor="email">Email</label>
+            <br/>
+            <input
+              type="text"
+              id="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+            {errors.email && <span className="errorText">{errors.email}</span>}
+          </div>
+
+          <div>
+            <label htmlFor="password">Password</label>
+            <br/>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+            />
+            {errors.password && <span className="errorText">{errors.password}</span>}
+          </div>
+        </div>
+
+
+        {/* Submit button */}
+        <button type="submit">Submit</button>
+        </div>
     </form>
   );
 }

@@ -10,10 +10,12 @@
 
 /*registered vs guest */
 .formSection{
-
+    width: 50%;
+    display: flex;
+    flex-direction: column;
 }
 
-/* individual label/input tag items*/
-.formItem{
+/* individual label/input tag items
 
 }
+*/

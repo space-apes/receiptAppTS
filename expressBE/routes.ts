@@ -15,6 +15,11 @@ import {
     createRegisteredSession
 } from './controllers/sessionsController';
 
+/*** API DOCUMENTATION ROUTES
+ *  are generated automatically at {baseUrl:basePort}/api-docs/ 
+ * see middleware.ts::addMiddleware()
+ * ***/
+
 /*** SESSION ROUTES ***/
 const sessionsRouter = Router();
 sessionsRouter.post('/createGuestSession', createGuestSession)
@@ -38,9 +43,6 @@ transactionsRouter.post('', createTransaction);
 transactionsRouter.get('/:transactionId', getTransactionByTransactionId);
 transactionsRouter.get('/user/:userId', getTransactionsByUserId);
 
-//create transaction 
-//get transactions from userId 
-//get users from transactionId
 
 
 
