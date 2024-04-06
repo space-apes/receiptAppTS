@@ -1,6 +1,4 @@
 import {Request, Response, NextFunction} from 'express'; 
-import {sign, verify} from 'jsonwebtoken'; 
-import {getRandomRoomName} from '../library/socket';
 import User from '../types/user'; 
 import UserDataService from '../services/userDataService/userDataService';
 import {getUserDataService} from '../serviceSelector';
@@ -12,12 +10,6 @@ import {
   APINotFoundError,
   APIAlreadyExistsError
 } from '../errors/apiError';
-import dotenv from 'dotenv';
-
-
-dotenv.config(); 
-const argon2 = require('argon2');
-
 
 
 /*

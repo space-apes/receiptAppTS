@@ -166,7 +166,7 @@ class SqlUserDataService implements UserDataService{
      * @returns Promise<User>
      */
 
-    async getByUserEmail(email: number): Promise<User>  {
+    async getByUserEmail(email: string): Promise<User>  {
 
         try {
             let retrieveQuery = `
@@ -174,7 +174,7 @@ class SqlUserDataService implements UserDataService{
             WHERE u.email = ?
             `;
 
-            let dbVars = [email];
+            const dbVars = [email];
 
             const [rows] = await this.dbPool.execute(retrieveQuery, dbVars) as RowDataPacket[];
 
@@ -186,7 +186,7 @@ class SqlUserDataService implements UserDataService{
                 });
             }
             else{
-                let user: User = {
+                const user: User = {
                     lastName: rows[0].lastName,
                     firstName: rows[0].firstName,
                     email: rows[0].email,
@@ -291,8 +291,46 @@ class SqlUserDataService implements UserDataService{
             throw err; 
         }
     }
-
     
+    /**
+     * areValidCredentials
+     * 
+     * this function takes in identifier and password and
+     * verifies that a user exists with the identifier and 
+     * that the password is valid. 
+     * 
+     * @param params
+     *   - string: userIdentifier in this case, email address
+     *   - string: password 
+     * @returns Promise<boolean> true if credentials are valid, false if not 
+     */
+
+    async areValidCredentials(params: {userIdentifier: string, password: string}): Promise<boolean> {
+        
+        const {userIdentifier, password} = params; 
+
+        try {
+            const userQuery:string = `
+            SELECT * from users u 
+            WHERE email = ? 
+            `;
+
+            let dbVars = [userIdentifier];
+
+            const [rows, fields] = await this.dbPool.execute(userQuery, dbVars) as RowDataPacket[];
+           
+            if (rows.length == 0 || ! await argon2.verify(rows[0]['password'], password)) {
+                return false;
+            }
+
+            return true;
+
+        }catch(err){
+            this.close(); 
+            throw err; 
+        }
+    
+    } 
 
 
 }

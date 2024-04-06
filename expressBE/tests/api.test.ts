@@ -1,5 +1,7 @@
 import supertest from 'supertest';
 import app from './app';
+import { jwtDecode, JwtPayload } from 'jwt-decode';
+import JWTClaims from '../services/sessionService/jwtClaims';
 
 let testUserData = {
     valid: {
@@ -451,6 +453,191 @@ describe("transactions controller", ()=> {
 
              });
              
+        });
+    });
+});
+
+
+describe("Sessions controller", ()=>{
+
+    describe("POST /createGuestSession", () =>{
+
+        describe("if given valid roomName and displayedName", () =>{
+            it("should respond with 200 and set cookie with userId -1", async () =>{
+
+                const res = await supertest.agent(app)
+                .post("/api/sessions/createGuestSession")
+                .set("content-type", "application/json")
+                .send({
+                    'displayedName': 'testJWTSuccessName',
+                    'roomName': 'testJWTSuccessRoomName'
+                });
+
+                const setCookies = res.headers['set-cookie'];
+
+                //set only one cookie
+                expect (setCookies.length).toBe(1);
+                const cookieString = setCookies[0];
+
+                //cookie includes name of jwt
+                expect(cookieString.includes('receiptAppJWT'));
+
+                //parse out just the jwt from the cookie string
+                const jwt = cookieString.match(/receiptAppJWT=([^;]+);/)?.[1];
+                
+                expect(res.status).toBe(200);
+
+
+                const claims = jwtDecode<JwtPayload & JWTClaims>(jwt || '');
+                
+                //have correct fields
+                expect(claims).toHaveProperty('userId');
+                expect(claims).toHaveProperty('displayedName');
+                expect(claims).toHaveProperty('roomName');
+                expect(claims).toHaveProperty('exp');
+
+                //have guest userId
+                expect(claims.userId).toBe(-1);
+
+
+            });
+        });
+
+        describe("if missing any required fields", ()=>{
+            it("should respond with 400", async ()=>{
+                const res = await supertest(app)
+                .post("/api/sessions/createGuestSession")
+                .set("content-type", "application/json")
+                .send({
+                    'displayedName': 'testJWTSuccessName',
+                });
+                
+                expect(res.status).toBe(400);
+            })
+        });
+
+        describe("if roomName contains '-'", ()=>{
+            it("should respond with 400", async ()=>{
+                const res = await supertest(app)
+                .post("/api/sessions/createGuestSession")
+                .set("content-type", "application/json")
+                .send({
+                    'displayedName': 'testJWTSuccessName',
+                    'roomName': 'cool-room'
+                });
+                
+                expect(res.status).toBe(400);
+            })
+        })
+    });
+
+    describe("POST /createRegisteredSession", () =>{
+        describe('if given valid credentials and all required fields', ()=>{
+            it("should respond with 200 and set cookie non guest userId", async () =>{
+
+                const res = await supertest.agent(app)
+                .post("/api/sessions/createRegisteredSession")
+                .set("content-type", "application/json")
+                .send({
+                    'displayedName': 'coolTestUser',
+                    'roomName': 'testJWTSuccessRoomName',
+                    'email': 'testUser1@test.com',
+                    'password':'testuser1password'
+                });
+
+                const setCookies = res.headers['set-cookie'];
+
+                //set only one cookie
+                expect (setCookies.length).toBe(1);
+                const cookieString = setCookies[0];
+
+                //cookie includes name of jwt
+                expect(cookieString.includes('receiptAppJWT'));
+
+                //parse out just the jwt from the cookie string
+                const jwt = cookieString.match(/receiptAppJWT=([^;]+);/)?.[1];
+                
+                expect(res.status).toBe(200);
+
+                const claims = jwtDecode<JwtPayload & JWTClaims>(jwt || '');
+                
+                //have correct fields
+                expect(claims).toHaveProperty('userId');
+                expect(claims).toHaveProperty('displayedName');
+                expect(claims).toHaveProperty('roomName');
+                expect(claims).toHaveProperty('exp');
+
+                expect(claims.userId != -1);
+
+
+            });
+        });
+
+        describe('all required fields but nonexistent email', ()=>{
+            it("should respond with 401", async () =>{
+
+                const res = await supertest(app)
+                .post("/api/sessions/createRegisteredSession")
+                .set("content-type", "application/json")
+                .send({
+                    'displayedName': 'coolTestUser',
+                    'roomName': 'testJWTSuccessRoomName',
+                    'email': 'nonExistantUser@test.com',
+                    'password':'testuser1password'
+                });
+
+                expect(res.status).toBe(401);
+            });
+        });
+
+        describe('all required fields but nonexistent email', ()=>{
+            it("should respond with 401", async () =>{
+
+                const res = await supertest(app)
+                .post("/api/sessions/createRegisteredSession")
+                .set("content-type", "application/json")
+                .send({
+                    'displayedName': 'coolTestUser',
+                    'roomName': 'testJWTSuccessRoomName',
+                    'email': 'testUser1@test.com',
+                    'password':'invalidPassword'
+                });
+
+                expect(res.status).toBe(401);
+            });
+        });
+
+        describe('room name with hyphen', ()=>{
+            it("should respond with 400", async () =>{
+
+                const res = await supertest(app)
+                .post("/api/sessions/createRegisteredSession")
+                .set("content-type", "application/json")
+                .send({
+                    'displayedName': 'coolTestUser',
+                    'roomName': 'testJWTFailure-RoomName',
+                    'email': 'testUser1@test.com',
+                    'password':'testuser1password'
+                });
+
+                expect(res.status).toBe(400);
+            });
+        });
+
+        describe('missing a field', ()=>{
+            it("should respond with 400", async () =>{
+
+                const res = await supertest(app)
+                .post("/api/sessions/createRegisteredSession")
+                .set("content-type", "application/json")
+                .send({
+                    'displayedName': 'coolTestUser',
+                    'email': 'testUser1@test.com',
+                    'password':'testuser1password'
+                });
+
+                expect(res.status).toBe(400);
+            });
         });
     });
 });

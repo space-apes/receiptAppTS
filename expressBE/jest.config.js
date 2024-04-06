@@ -3,5 +3,8 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  globalSetup: './tests/bootstrap.ts'
+  globalSetup: './tests/bootstrap.ts',
+  testMatch:[
+  	'**/tests/**/*.test.ts'
+  ]
 };

@@ -8,7 +8,8 @@ import * as OpenApiValidator from 'express-openapi-validator';
 import fs from 'fs'; 
 import {
     usersRouter,
-    transactionsRouter
+    transactionsRouter,
+    sessionsRouter
 } from './routes';
 
 //simply displays requests in console for running express app
@@ -37,7 +38,8 @@ const customErrorHandlerMiddleware  = (err: HttpError, req:Request, res: Respons
 			`);
 
 			return res.status(err.responseCode || 500).json({
-				path: err.path
+				path: err.path,
+                msg: err.message
 			});
 		}
 	}
@@ -77,8 +79,6 @@ function attachMiddleware(app: Express) : Express {
     })
 
 
-
-
     //main app middleware
     app.use([
         cors({origin: "*"}),
@@ -87,7 +87,6 @@ function attachMiddleware(app: Express) : Express {
         express.text(),
         express.urlencoded({extended: false})
     ]);
-
 
     //validator middleware
 
@@ -111,6 +110,9 @@ function attachMiddleware(app: Express) : Express {
     //transactions routes
     app.use('/api/transactions', [express.json(), transactionsRouter]); 
 
+    //sessions routes
+    app.use('/api/sessions', [express.json(), sessionsRouter]); 
+    
     //openAPI documentation routes
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openAPIDocJSONObj));
 

@@ -16,7 +16,7 @@ URL="http://127.0.0.1:4000/api"
 
 # make sure to check out the jwt with a jwt decoding tool and compare to the endpoint code
 # to see that fields are correct. a successful login should yield a non '-1' userId value
-POST_login_success_1() {
+POST_login_success1() {
 
     payload='{
         "email": "testUser1@test.com",
@@ -49,7 +49,7 @@ POST_users_success1() {
      "$URL/users"
 }
 
-GET_users_success_1(){
+GET_users_success1(){
     curl \
 	 --include \
      --request 'GET' \
@@ -65,7 +65,7 @@ GET_users_failure_notFound1(){
 
 }
 
-PUT_users_success_1(){
+PUT_users_success1(){
 
     payload='{
         "email": "testUser1Updated@test.com"
@@ -80,7 +80,7 @@ PUT_users_success_1(){
      "$URL/users/1"
 }
 
-PUT_users_success_2(){
+PUT_users_success2(){
 
     payload='{
         "email": "testUser1UpdatedSecond@test.com",
@@ -203,7 +203,7 @@ GET_transactions_success1() {
      "$URL/transactions/1"
 }
 
-GET_transactions-users_success1() {
+GET_transactions_users_success1() {
 
     curl \
      --cookie-jar 'cookies.txt' \
@@ -212,6 +212,51 @@ GET_transactions-users_success1() {
      "$URL/transactions/user/3" | jq
 }
 
+POST_session_guest1() {
+    payload='{
+        "displayedName": "tiny tim",
+        "roomName": "tims cool room" 
+    }'
+
+    curl \
+     --cookie-jar 'cookies.txt' \
+     --request 'POST' \
+     --header 'Content-Type: application/json' \
+     --data "$payload" \
+     "$URL/sessions/createGuestSession"
+}
+
+POST_session_failure_roomNameContainsHyphen_guest1() {
+    payload='{
+        "displayedName": "tiny tim",
+        "roomName": "tims cool-room" 
+    }'
+
+    curl \
+     --cookie-jar 'cookies.txt' \
+     --include \
+     --request 'POST' \
+     --header 'Content-Type: application/json' \
+     --data "$payload" \
+     "$URL/sessions/createGuestSession"
+}
+
+POST_session_failure_nonexistent_email_registered1() {
+    payload='{
+        "displayedName": "tiny tim",
+        "roomName": "tims coolroom",
+        "email": "nosuchemail@test.com",
+        "password": "coolpasswordbro:"
+    }'
+
+    curl \
+     --cookie-jar 'cookies.txt' \
+     --include \
+     --request 'POST' \
+     --header 'Content-Type: application/json' \
+     --data "$payload" \
+     "$URL/sessions/createRegisteredSession"
+}
 
 
 ########## EXECUTION ##########
