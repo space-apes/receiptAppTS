@@ -13,19 +13,21 @@ class CustomJWTSessionService implements SessionService {
      */
 
     create(params: {
-        userId?: number, 
+        userId: number, 
         displayedName: string, 
         roomName: string
+        isInitiator: boolean
     }): string {
 
         //set to -1 if no userId supplied 
-        const userId = params.userId || -1;
-        const {displayedName, roomName} = params; 
+        const userId = params.userId;
+        const {displayedName, roomName, isInitiator} = params; 
 
         const jwtClaims: JWTClaims = {
             userId : userId,
             displayedName : displayedName,
-            roomName:roomName
+            roomName:roomName,
+            isInitiator: isInitiator 
         }
 
         return sign(
