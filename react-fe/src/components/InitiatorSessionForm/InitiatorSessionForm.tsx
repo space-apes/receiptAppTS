@@ -1,8 +1,11 @@
 import {useState} from 'react';
 import "./InitiatorSessionForm.css";
-
+import apiClient from '../../services/apiService/apiService';
+import {jwtDecode} from 'jwt-decode';
+import { AxiosError } from 'axios';
 
 function InitiatorSessionForm() {
+
   const [formData, setFormData] = useState({
     roomName: '',
     displayedName: '',
@@ -20,31 +23,34 @@ function InitiatorSessionForm() {
     });
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    const roomName = formData.roomName.trim();
+    const displayedName = formData.displayedName.trim();
+    const email = formData.email.trim();
+    const password = formData.password.trim();
 
     let validationErrors: {[key:string]: string} = {};
 
-    if (!formData.roomName.trim()) {
+    if (!roomName) {
       validationErrors.roomName = 'roomName is required';
     }
 
-    if (!formData.displayedName.trim()) {
+    if (!displayedName) {
       validationErrors.displayedName = 'displayedName is required';
     }
 
     //need both email and password 
-    if ((!formData.email.trim() && formData.password.trim()) ||
-      (formData.email.trim() && !formData.password.trim())
-    ) {
+    if (!email && password) {
       validationErrors.email = 'if submitting email or password need both';
+    }
+    if (email && !password) {
       validationErrors.password = 'if submitting email or password need both';
     }
 
-
-
     
-    if (formData.email.trim() && !/\S+@\S+\.\S+/.test(formData.email.trim())) {
+    if (email && !/\S+@\S+\.\S+/.test(email)) {
       validationErrors.email = 'Email is invalid';
     }
     
@@ -55,8 +61,49 @@ function InitiatorSessionForm() {
       return;
     }
 
-    // Submit the form if there are no errors
-    console.log('Form submitted:', formData);
+    
+    try{
+
+      let res: any; 
+
+      if (formData.email && formData.password){
+          res = await apiClient.apiSessionsCreateRegisteredSessionPost({
+          displayedName: displayedName,
+          roomName: roomName,
+          email: email,
+          password: password
+        },
+        {
+          withCredentials: true,
+        });
+      }else{
+          res = await apiClient.apiSessionsCreateGuestSessionPost({
+          displayedName: displayedName,
+          roomName: roomName,
+        },
+        {
+          withCredentials: true,
+        });
+      }
+
+      if (res.status == 200){
+        //set state variables with response 
+        //navigate to receipt scan page
+      }
+
+    }catch(err){
+      
+      if (err instanceof AxiosError){
+        if(err.response && err.response.status == 401){
+          setErrors({email: 'invalid email/password', password: 'invalid email/password'});
+          return;
+        }
+      }
+      else{
+        console.log('InitiatorSessionForm::', err);
+      }
+
+    }
   };
 
   return (
@@ -122,7 +169,6 @@ function InitiatorSessionForm() {
         </div>
 
 
-        {/* Submit button */}
         <button type="submit">Submit</button>
         </div>
     </form>

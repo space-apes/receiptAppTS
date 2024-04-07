@@ -200,7 +200,7 @@ const createGuestSession = async (req: Request, res: Response, next: NextFunctio
         //create httpOnly cookie to store jwt 
         res.cookie("receiptAppJWT", sessionToken, {
         maxAge: jwtDurationInSeconds,
-        httpOnly:true,
+        httpOnly:false,
         //secure:true
         });
 

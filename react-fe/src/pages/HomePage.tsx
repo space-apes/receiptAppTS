@@ -33,7 +33,7 @@ const HomePage = () => {
 				<h4>
 					Enter your roomName and displayedName to start a guest transaction.
 					<br/><br/>
-					Optionally, enter email/password to login and remember this transaction.
+					Optionally, enter email/password to start a transaction and remember it as a logged in user!
 				</h4>
 				<InitiatorSessionForm/>
 			</div>

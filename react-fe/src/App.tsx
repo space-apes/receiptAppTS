@@ -19,10 +19,9 @@ function App() {
 		curUsername: "",
 		userId: 0,
 		receiptArray: [],
-		isConnectedToSocketServer: false 
+		isConnectedToSocketServer: false,
 	};
 
-	//const [globals, setGlobals] = useState ({curUsername: "", userId: 0, receiptArray: [], isConnectedToSocketServer: socket.connected});
 	const [globals, setGlobals] = useState (initializedGlobals);
 
 	useEffect(()=>{
