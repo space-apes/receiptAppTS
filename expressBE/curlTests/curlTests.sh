@@ -258,6 +258,13 @@ POST_session_failure_nonexistent_email_registered1() {
      "$URL/sessions/createRegisteredSession"
 }
 
+GET_api-docs1() {
+    curl \
+     --include \
+     --request 'GET' \
+     "http://127.0.0.1:4000/api-docs"
+}
+
 
 ########## EXECUTION ##########
 

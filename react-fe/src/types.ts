@@ -7,8 +7,11 @@ interface ReceiptItemType {
 };
 
 interface GlobalDataType {
-	curUsername: string, 
-	userId: number, 
+	//urUsername: string, 
+	//userId: number, 
+	isInitiator: boolean,
+	displayedName: string,
+	roomName: string,
 	isConnectedToSocketServer: boolean, 
 	receiptArray: ReceiptItemType[],
 };

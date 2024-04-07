@@ -1,6 +1,7 @@
 import {useNavigate} from 'react-router-dom';
 import React, {useContext} from 'react';
 import GlobalContext from '../context/GlobalContext';
+import InitiatorSessionForm from '../components/InitiatorSessionForm/InitiatorSessionForm';
 
 const HomePage = () => {
 
@@ -18,27 +19,23 @@ const HomePage = () => {
 		//currentTarget is where handler is attached 
 
 		//update user context 
-		setGlobals({...globals, curUsername: e.currentTarget.usernameInput.value});
+		//setGlobals({...globals, curUsername: e.currentTarget.usernameInput.value});
 
 		//navigate to react route 
-		navigate('/receiptSelect');
+		//navigate('/receiptSelect');
 		
 	}
 
 	return (
 		<div className="homePageDiv"> 
 			<h1> Home Screen </h1> 
-
 			<div className="centered">
-				<form onSubmit={handleSubmit}> 
-
-					<p> please enter your username </p>
-					<label>
-						<input type="text" name="usernameInput"/> 
-					</label>
-
-					<button> submit </button>
-				</form>
+				<h4>
+					Enter your roomName and displayedName to start a guest transaction.
+					<br/><br/>
+					Optionally, enter email/password to start a transaction and remember it as a logged in user!
+				</h4>
+				<InitiatorSessionForm/>
 			</div>
 		</div> 
 	);

@@ -473,6 +473,14 @@ describe("Sessions controller", ()=>{
                     'roomName': 'testJWTSuccessRoomName'
                 });
 
+                expect(res.status).toBe(200);
+
+                //have correct body fields
+                expect(res.body).toHaveProperty('displayedName');
+                expect(res.body).toHaveProperty('roomName');
+                expect(res.body).toHaveProperty('isInitiator');
+                
+                expect(res.body.isInitiator);
                 const setCookies = res.headers['set-cookie'];
 
                 //set only one cookie
@@ -485,19 +493,19 @@ describe("Sessions controller", ()=>{
                 //parse out just the jwt from the cookie string
                 const jwt = cookieString.match(/receiptAppJWT=([^;]+);/)?.[1];
                 
-                expect(res.status).toBe(200);
-
 
                 const claims = jwtDecode<JwtPayload & JWTClaims>(jwt || '');
                 
-                //have correct fields
+                //have correct jwt fields
                 expect(claims).toHaveProperty('userId');
                 expect(claims).toHaveProperty('displayedName');
                 expect(claims).toHaveProperty('roomName');
                 expect(claims).toHaveProperty('exp');
+                expect(claims).toHaveProperty('isInitiator');
 
                 //have guest userId
                 expect(claims.userId).toBe(-1);
+                expect(claims.isInitiator).toBe(true);
 
 
             });
@@ -559,6 +567,13 @@ describe("Sessions controller", ()=>{
                 
                 expect(res.status).toBe(200);
 
+                //have correct body fields
+                expect(res.body).toHaveProperty('displayedName');
+                expect(res.body).toHaveProperty('roomName');
+                expect(res.body).toHaveProperty('isInitiator');
+
+                expect(res.body.isInitiator);
+
                 const claims = jwtDecode<JwtPayload & JWTClaims>(jwt || '');
                 
                 //have correct fields
@@ -566,8 +581,10 @@ describe("Sessions controller", ()=>{
                 expect(claims).toHaveProperty('displayedName');
                 expect(claims).toHaveProperty('roomName');
                 expect(claims).toHaveProperty('exp');
+                expect(claims).toHaveProperty('isInitiator');
 
                 expect(claims.userId != -1);
+                expect(claims.isInitiator).toBe(true);
 
 
             });

@@ -149,9 +149,18 @@ const createNewRegisteredSession = async (req: Request, res: Response, next: Nex
  *               type: object 
  *               required: 
  *                 - msg
+ *                 - displayedName
+ *                 - roomName
+ *                 - isInitiator
  *               properties:
  *                 msg: 
  *                   type: string
+ *                 displayedName: 
+ *                   type: string
+ *                 roomName: 
+ *                   type: string
+ *                 isInitiator: 
+ *                   type: boolean
  *       '400': 
  *         description: catch-all invalid input response
  *         content: 
@@ -174,6 +183,8 @@ const createGuestSession = async (req: Request, res: Response, next: NextFunctio
     //note: use dedicated auth/identity services for next iteration
 
     const {displayedName, roomName} = req.body;
+    const userId:number =  -1;
+    const isInitiator = true; 
 
 
     try {
@@ -190,9 +201,13 @@ const createGuestSession = async (req: Request, res: Response, next: NextFunctio
 
         const sessionService: SessionService = await getSessionService();
 
+        const randomizedRoomName: string = sessionService.addRandomStringToRoomName(roomName)
+
         const sessionToken: string = sessionService.create({
+            userId: userId,
+            isInitiator: isInitiator,
             displayedName: displayedName,
-            roomName: sessionService.addRandomStringToRoomName(roomName)
+            roomName: randomizedRoomName
         });
 
         const jwtDurationInSeconds = sessionService.convertJWTDurationToSeconds(process.env.JWT_DURATION as string);
@@ -200,16 +215,18 @@ const createGuestSession = async (req: Request, res: Response, next: NextFunctio
         //create httpOnly cookie to store jwt 
         res.cookie("receiptAppJWT", sessionToken, {
         maxAge: jwtDurationInSeconds,
-        httpOnly:true,
+        httpOnly:false,
         //secure:true
         });
 
         //give success response
         return res.status(200).json({
-            msg: "successfully created access token", 
+            msg: "successfully created access token",
+            displayedName: displayedName,
+            roomName: randomizedRoomName,
+            isInitiator: isInitiator 
         });
 
-        
     }catch(err){
         next(err);
     }
@@ -257,9 +274,18 @@ const createGuestSession = async (req: Request, res: Response, next: NextFunctio
  *               type: object 
  *               required: 
  *                 - msg
+ *                 - displayedName
+ *                 - roomName
+ *                 - isInitiator
  *               properties:
  *                 msg: 
  *                   type: string
+ *                 displayedName: 
+ *                   type: string
+ *                 roomName: 
+ *                   type: string
+ *                 isInitiator: 
+ *                   type: boolean
  *       '401': 
  *         description: invalid credentials
  *         content: 
@@ -296,6 +322,7 @@ const createRegisteredSession = async (req: Request, res: Response, next: NextFu
     //note: use dedicated auth/identity services for next iteration
 
     const {displayedName, roomName, email, password} = req.body; 
+    const isInitiator = true; 
 
     try {
         
@@ -339,11 +366,14 @@ const createRegisteredSession = async (req: Request, res: Response, next: NextFu
         userDataService.close && userDataService.close()
 
         const sessionService: SessionService = await getSessionService();
+        
+        const randomizedRoomName: string =  sessionService.addRandomStringToRoomName(roomName);
 
         const sessionToken: string = sessionService.create({
             userId: userId,
             displayedName: displayedName,
-            roomName: sessionService.addRandomStringToRoomName(roomName)
+            isInitiator: isInitiator,
+            roomName: randomizedRoomName
         });
 
         const jwtDurationInSeconds = sessionService.convertJWTDurationToSeconds(process.env.JWT_DURATION as string);
@@ -358,6 +388,9 @@ const createRegisteredSession = async (req: Request, res: Response, next: NextFu
         //give success response
         return res.status(200).json({
             msg: "successfully created access token", 
+            displayedName: displayedName,
+            roomName: randomizedRoomName,
+            isInitiator: isInitiator
         });
         
     }catch(err){

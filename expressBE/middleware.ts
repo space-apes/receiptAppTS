@@ -81,7 +81,7 @@ function attachMiddleware(app: Express) : Express {
 
     //main app middleware
     app.use([
-        cors({origin: "*"}),
+        cors({origin: true, credentials: true}),
         displayRequestsMiddleware,
         express.json(),
         express.text(),

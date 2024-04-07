@@ -6,12 +6,12 @@ const Navbar = () => {
 
 	const {globals} = useContext(GlobalContext); 
 
-	const {curUsername, isConnectedToSocketServer} = globals;
+	const {displayedName, isConnectedToSocketServer} = globals;
 
 	return (
 		<header> 
 			<div className="container"> 
-				<h1> Welcome, {curUsername ? curUsername : 'Anonymous'} ! </h1>
+				<h1> Welcome to ReceiptApp, {displayedName ? displayedName : 'Anonymous'} ! </h1>
 				<p> connected to socket server: {isConnectedToSocketServer ? 'true': 'false'} </p>
 				<Link to="/">
 					<p> home </p>
