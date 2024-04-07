@@ -17,7 +17,7 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
   - less context switching when doing full-stack work.
   - FE and BE teams can communicate more clearly and understand each other's needs.  
 
-- layered service-based architecture: 
+- layered design to prepare for micro-services architecture: 
   - controller/API layer and service layer 
   - service layer for anything outside of synchronous operation with different implementations for different technologies
   - each service conforms to an interface and can be swapped in without affecting other layers 
