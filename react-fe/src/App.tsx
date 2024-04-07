@@ -5,6 +5,7 @@ import {GlobalDataType} from './types';
 import Navbar  from './components/Navbar';
 import HomePage from './pages/HomePage';
 import ReceiptSelectPage from './pages/ReceiptSelectPage'; 
+import ReceiptScanPage from './pages/ReceiptScanPage';
 import socket from './socket'; 
 /*
 to update context combine it with state: 
@@ -16,8 +17,11 @@ to update context combine it with state:
 function App() {
 
 	const initializedGlobals:GlobalDataType = {
-		curUsername: "",
-		userId: 0,
+		//curUsername: "",
+		//userId: 0,
+		displayedName: "",
+		roomName: "",
+		isInitiator: false,
 		receiptArray: [],
 		isConnectedToSocketServer: false,
 	};
@@ -61,6 +65,11 @@ function App() {
 						<Route 
 						path="/"
 						element = {<HomePage />}
+						>
+						</Route> 
+						<Route 
+						path ="/receiptScan"
+						element = { <ReceiptScanPage /> } 
 						>
 						</Route> 
 

@@ -1,10 +1,13 @@
-import {useState} from 'react';
+import {useState, useContext} from 'react';
+import {useNavigate} from 'react-router-dom';
 import "./InitiatorSessionForm.css";
 import apiClient from '../../services/apiService/apiService';
-import {jwtDecode} from 'jwt-decode';
+import GlobalContext from '../../context/GlobalContext';
 import { AxiosError } from 'axios';
 
 function InitiatorSessionForm() {
+
+  const {globals, setGlobals} = useContext(GlobalContext); 
 
   const [formData, setFormData] = useState({
     roomName: '',
@@ -15,6 +18,7 @@ function InitiatorSessionForm() {
 
   const [errors, setErrors] = useState<{[key:string]: string}>({});
 
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData({
@@ -22,6 +26,8 @@ function InitiatorSessionForm() {
       [name]: value,
     });
   };
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -87,8 +93,18 @@ function InitiatorSessionForm() {
       }
 
       if (res.status == 200){
-        //set state variables with response 
+
+        //set state variables with response data
+        //want actual roomName and not the room name that will
+        //be stripped and displayed
+        setGlobals({...globals, 
+          roomName: res.data.roomName,
+          displayedName: res.data.displayedName,
+          isInitiator: res.data.isInitiator
+        });
+        
         //navigate to receipt scan page
+        navigate('/ReceiptScan');
       }
 
     }catch(err){

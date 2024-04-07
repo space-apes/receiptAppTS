@@ -19,10 +19,10 @@ const HomePage = () => {
 		//currentTarget is where handler is attached 
 
 		//update user context 
-		setGlobals({...globals, curUsername: e.currentTarget.usernameInput.value});
+		//setGlobals({...globals, curUsername: e.currentTarget.usernameInput.value});
 
 		//navigate to react route 
-		navigate('/receiptSelect');
+		//navigate('/receiptSelect');
 		
 	}
 

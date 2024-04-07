@@ -1,12 +1,12 @@
 import SessionService from './sessionService';
 import JWTClaims from './jwtClaims';
-import {sign, verify, JwtPayload} from 'jsonwebtoken'; 
+import {sign, verify} from 'jsonwebtoken'; 
 
 
 class CustomJWTSessionService implements SessionService {
 
     /**
-     * createNew: creates a new session
+     * create: creates a new session
      * 
      * if no userId supplied this is guest session, set userId to -1
      * 
@@ -19,9 +19,7 @@ class CustomJWTSessionService implements SessionService {
         isInitiator: boolean
     }): string {
 
-        //set to -1 if no userId supplied 
-        const userId = params.userId;
-        const {displayedName, roomName, isInitiator} = params; 
+        const {userId, displayedName, roomName, isInitiator} = params; 
 
         const jwtClaims: JWTClaims = {
             userId : userId,
@@ -40,6 +38,15 @@ class CustomJWTSessionService implements SessionService {
     }
 
 
+    /**
+     * verifies session token. 
+     * 
+     * returns true if valid 
+     * throws 
+     * 
+     * @param params 
+     * @returns 
+     */
     async isValidSessionToken(params: {jwt: string}): Promise<boolean>{
         const {jwt} = params;
 

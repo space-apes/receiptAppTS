@@ -11,12 +11,13 @@ const ReceiptSelectItem = ( props:{receiptSelectDataItem:ReceiptItemType, index:
 
     const {globals} = useContext (GlobalContext); 
 
-    const {curUsername} = globals;
+    //const {curUsername} = globals;
+    const {displayedName} = globals; 
     const {itemName, price, username} = receiptSelectDataItem;
 
     const handleOnClick = () => {
-        console.log(`emitting update user event with index: ${index}, newUsername: ${curUsername}`)
-        socket.emit('updateItemUser', {index: index, newUsername: curUsername})
+        console.log(`emitting update user event with index: ${index}, newUsername: ${displayedName}`)
+        socket.emit('updateItemUser', {index: index, newUsername: displayedName})
     }
 
     return (
