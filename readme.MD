@@ -28,7 +28,6 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
   - single source of truth using openAPI 3.0 specification
   - generate as much code by trusted open source libraries as possible over writing my own solutions (documentation, validators, client-side API library)
   - language/framework agnostic and can switch technologies if needed
-  - documentation generated dynamically as new features added
 
 - test-driven development: 
   - increase coverage
