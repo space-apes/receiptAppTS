@@ -6,8 +6,8 @@
 5. [How To Run](#how-to-run)
 
 # Introduction
-This is my dream full stack web applicationwith the goals of minimizing software maintenance costs, developer headaches, and experimenting with
-new technologies, architectures, and project management tools. It is currently _STILL IN DEVELOPMENT_. 
+This is my dream full stack web application with the goals of minimizing software maintenance costs, developer headaches, and experimenting with
+new technologies, architectures, and project management tools. It is currently _STILL IN DEVELOPMENT_. After monolithic app is created, next step is to break into micro services and deploy to AWS. 
 
 ReceiptApp is a service for groups of people who need a quick and easy way to split the bill at places like restaurants or bars. Simply scan a receipt which will be parsed by an OCR, send a unique URL link to your friends, then collectively select who will pay for which items will in real time. Once the purchase has been submitted, registered users have the ability to review previous receipts. In the future, payments will also be handled automatically by 3rd party payment APIs (stripe, venmo, etc). 
 
@@ -47,13 +47,7 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
   - github Projects for tickets, work delegation: [ReceiptAppTS Project Page](https://github.com/users/space-apes/projects/7)
   - github Wiki for documentation: [ReceiptAppTS Wiki Page](https://github.com/space-apes/receiptAppTS/wiki)
  
-- experiment with JWTs 
-  - 'session' data and auth data stored in JWTs
-  - added security
-    - http-only cookies that can not be read directly by code
-	- quick expiration
-	- validation of JWTs to check for data integrity
-  - allow session to be sticky without needing make expensive service calls
+- experiment with JWTs: stickiness with minimum amount of expensive persistent storage lookups. 
 
 
 # Stack 
@@ -61,16 +55,17 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
 - FE
   - UI: react.js written in typescript 
   - asynchronous realtime communication: socket.io
+  - API library: openapi-generator
 - BE 
   - API: express.js written in typescript for API
   - JWT: jsonwebtoken
   - password hashing: Argon2
   - API validation: express-openapi-validator
   - API documentation: swagger-ui-express
-  - persisted data services: mysql accessed by node through mysql2 library
+  - persisted data services: mysql
 
 # Future Improvements
-- the real goal is to use this monolithic app as practice for converting into a cloud based scalable micro-services app: pull User, Transaction, Session, and ReceiptParsing services into their own micro-service instances with Dockerfiles and node images. reverse-proxy for monitoring, load-balancers for each service with horizontal scaling handled. I aim to build everything using terraform IaC. 
+- the real goal is to use this monolithic app as practice for converting to a cloud based scalable micro-services app: pull User, Transaction, Session, and ReceiptParsing services into their own micro-service instances with Dockerfiles and node images. reverse-proxy for monitoring, load-balancers for each service with horizontal scaling handled. I aim to build everything using terraform IaC. 
 - be completely contract driven instead of partially and generate all controller, validator, model code from contract
 - further separate service layer into generic data retrieval layers and programatic business logic/processing layer. the data retrieval layer could handle retrieving and formatting data in some standardized way and the business logic layer could remain unchanged.
 - integration with third party payment APIs 
