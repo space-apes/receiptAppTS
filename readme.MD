@@ -6,7 +6,7 @@
 5. [How To Run](#how-to-run)
 
 # Introduction
-This is my dream BE project with the goals of minimizing software maintenance costs, developer headaches, and experimenting with
+This is my dream full stack web applicationwith the goals of minimizing software maintenance costs, developer headaches, and experimenting with
 new technologies, architectures, and project management tools. It is currently _STILL IN DEVELOPMENT_. 
 
 ReceiptApp is a service for groups of people who need a quick and easy way to split the bill at places like restaurants or bars. Simply scan a receipt which will be parsed by an OCR, send a unique URL link to your friends, then collectively select who will pay for which items will in real time. Once the purchase has been submitted, registered users have the ability to review previous receipts. In the future, payments will also be handled automatically by 3rd party payment APIs (stripe, venmo, etc). 
