@@ -90,10 +90,10 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
     - String JWT_SECRET # arbitrary random string
     - String JWT_DURATION # ex "20m" or "1h" 
 
-    - String DB_DATABASE 
-    - String DB_URL 
-    - String DB_USER 
-    - String DB_PASSWORD
+    - String DEV_DB_DATABASE 
+    - String DEV_DB_URL 
+    - String DEV_DB_USER 
+    - String DEV_DB_PASSWORD
     - Number DEV_DB_CONNECTIONLIMIT
     
     - String TEST_DB_URL
