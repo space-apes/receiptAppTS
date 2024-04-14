@@ -55,7 +55,7 @@ ReceiptApp is a service for groups of people who need a quick and easy way to sp
 - FE
   - UI: react.js written in typescript 
   - asynchronous realtime communication: socket.io
-  - API library: openapi-generator
+  - API client library: openapi-generator
 - BE 
   - API: express.js written in typescript for API
   - JWT: jsonwebtoken
