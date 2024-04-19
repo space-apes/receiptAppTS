@@ -1,12 +1,11 @@
 import ReceiptItem from './receiptItem';
-import User from './user';
 
 interface Transaction {
-    transactionId: number,
+    transactionId?: number,
     initiatorUserId: number,
     businessName: string,
     receiptItems: ReceiptItem[]
-    dateCreated: string,
+    dateCreated?: string,
 };
 
 export default Transaction; 
